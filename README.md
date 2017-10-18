@@ -1,4 +1,4 @@
-# AngularMaterialTable
+# Angular4 material table
 
 This project extends Angular 4 CDK data-table, also used in `@angular/material` table.
 
@@ -6,4 +6,4 @@ It extends `@angular/cdk/collections` DataSource in order to include a row struc
 
 To install the package:
 
-`npm install angular-material-table`
+`npm install angular4-material-table`

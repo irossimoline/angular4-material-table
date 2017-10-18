@@ -48,6 +48,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       const source = this.rowsSubject.getValue();
       source[row.id] = row;
       this.rowsSubject.next(source);
+      row.editing = false;
     }
   }
 
@@ -56,6 +57,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       const source = this.rowsSubject.getValue();
       row.id = source.length - 1;
       this.rowsSubject.next(source);
+      row.editing = false;
     }
   }
 

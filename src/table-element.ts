@@ -20,14 +20,8 @@ export class TableElement<T> {
     this.source.delete(this.id);
   }
 
-  confirmCreate() {
-    this.editing = false;
-    this.source.confirmCreate(this);
-  }
-
   confirmEditCreate() {
     this.originalData = undefined;
-    this.editing = false;
     if (this.id == -1)
       this.source.confirmCreate(this);
     else

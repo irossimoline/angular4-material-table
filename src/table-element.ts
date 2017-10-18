@@ -31,6 +31,7 @@ export class TableElement<T> {
   startEdit() {
     this.originalData = cloneDeep(this.currentData);
     this.editing = true;
+    this.validator.enable();
   }
 
   cancel() {
@@ -39,6 +40,7 @@ export class TableElement<T> {
     else {
       this.currentData = this.originalData;
       this.editing = false;
+      this.validator.disable();
     }
   }
 }

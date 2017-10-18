@@ -49,6 +49,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       source[row.id] = row;
       this.rowsSubject.next(source);
       row.editing = false;
+      row.validator.disable();
     }
   }
 
@@ -58,6 +59,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       row.id = source.length - 1;
       this.rowsSubject.next(source);
       row.editing = false;
+      row.validator.disable();
     }
   }
 
@@ -100,12 +102,16 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   getRowsFromData(data: T[]): TableElement<T>[] {
     return data.map<TableElement<T>>((data, index) => {
+
+      const validator = this.validatorService.getRowValidator();
+      validator.disable();
+
       return new TableElement({
         id: index,
         editing: false,
         currentData: data,
         source: this,
-        validator: this.validatorService.getRowValidator(),
+        validator: validator,
       })
     });
   }

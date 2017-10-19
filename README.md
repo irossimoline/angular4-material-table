@@ -12,7 +12,9 @@ To install the package run:
 
 ## Example
 
+Example of using `angular4-material-table`:
 
+[angular4-material-table](https://i.imgur.com/vncajJG.png)
 
 
 ## Use
@@ -61,9 +63,11 @@ Angular 4 material table use example:
 
 #### Optional libraries
 Optional libraries used in the example:
-```"@angular/material": "2.0.0-beta.12",
+```
+"@angular/material": "2.0.0-beta.12",
 "@angular/forms": "4.4.4", // <- For inline validation
-"font-awesome": "4.7.0"```
+"font-awesome": "4.7.0"
+```
 
 #### person-list.component.html
 
@@ -151,16 +155,6 @@ class PersonValidatorService implements ValidatorService {
   }
 }
 
-
 ```
-
-
-
-
-
-
-
-
-
 
 

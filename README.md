@@ -14,7 +14,7 @@ To install the package run:
 
 Example of using `angular4-material-table`:
 
-[angular4-material-table](https://i.imgur.com/vncajJG.png)
+![angular4-material-table](https://i.imgur.com/vncajJG.png)
 
 
 ## Use

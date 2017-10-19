@@ -34,7 +34,7 @@ export class TableElement<T> {
     this.validator.enable();
   }
 
-  cancel() {
+  cancelOrDelete() {
     if (this.id == -1 || !this.editing)
       this.delete();
     else {

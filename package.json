@@ -3,7 +3,7 @@
   "description": "Angular 4 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
   "keywords": ["angular","angular4","table","inline validation","angular material table"],
   "author": "irossimoline",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "license": "MIT",
   "scripts": {
     "transpile": "ngc",
@@ -19,7 +19,8 @@
     "@angular/cdk": "2.0.0-beta.12",
     "core-js": "^2.4.1",
     "rxjs": "^5.1.0",
-    "zone.js": "^0.8.4"
+    "zone.js": "^0.8.4",
+    "lodash.clonedeep": "^4.5.0"
   },
   "devDependencies": {
     "@angular/cli": "1.1.2",

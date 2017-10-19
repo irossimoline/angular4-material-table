@@ -17,7 +17,12 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   private dataConstructor: new () => T;
   private dataKeys: any[];
 
-
+  /**
+   * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
+   * @param data Array containing the initial values for the TableDataSource. If not specified, then `dataType` must be specified.
+   * @param dataType Type of data contained by the Table. If not specified, then `data` with at least one element must be specified.
+   * @param validatorService Service that create instances of the FormGroup used to validate row fields.
+   */
   constructor(
     data: T[],
     dataType?: new () => T,
@@ -43,6 +48,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     this.rowsSubject.subscribe(rows => this.updateDatasource(rows));
   }
 
+  /**
+   * Confirm edition of the row. Save changes and disable editing.
+   * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
+   * @param row Row to be edited.
+   */
   confirmEdit(row: TableElement<T>) {
     if (row.validator.valid) {
       const source = this.rowsSubject.getValue();
@@ -53,6 +63,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
+  /**
+   * Confirm creation of the row. Save changes and disable editing.
+   * If validation active and row data is invalid, it doesn't confirm creation neither disable editing.
+   * @param row Row to be confirmed.
+   */
   confirmCreate(row: TableElement<T>) {
     if (row.validator.valid) {
       const source = this.rowsSubject.getValue();
@@ -63,6 +78,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
+  /**
+   * Start the creation of a new element, pushing an empty-data row in the table.
+   */
   createNew() {
     const source = this.rowsSubject.getValue();
     if (source.length == 0 || source[source.length - 1].id > -1) {
@@ -77,6 +95,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
+  /**
+   * Delete the row with the index specified.
+   */
   delete(id: number) {
     const source = this.rowsSubject.getValue();
 
@@ -88,6 +109,10 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     this.rowsSubject.next(source);
   }
 
+  /**
+   * Get the data from the rows.
+   * @param rows Rows to extract the data.
+   */
   getDataFromRows(rows: TableElement<T>[]): T[] {
     return rows
       .filter(row => row.id != -1)
@@ -96,10 +121,18 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     });
   }
 
+  /**
+   * Update the datasource with the data contained in the specified rows.
+   * @param rows Rows that contains the datasource's new data.
+   */
   updateDatasource(rows: TableElement<T>[]): void {
     this.datasourceSubject.next(this.getDataFromRows(rows));
   }
 
+  /**
+   * From an array of data, it returns rows containing the original data.
+   * @param data Data from which create the rows.
+   */
   getRowsFromData(data: T[]): TableElement<T>[] {
     return data.map<TableElement<T>>((data, index) => {
 
@@ -116,6 +149,12 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     });
   }
 
+  /**
+   * Create a new object with identical structure than the table source data.
+   * It uses the object's type contructor if available, otherwise it creates
+   * an object with the same keys of the first element contained in the original
+   * datasource (used in the constructor).
+   */
   createNewObject() {
     if (this.dataConstructor)
       return new this.dataConstructor();
@@ -128,7 +167,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   }
 
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
+  /** Connect function called by the table to retrieve one stream containing
+   *  the data to render. */
   connect(): Observable<TableElement<T>[]> {
     return this.rowsSubject.asObservable();
   }

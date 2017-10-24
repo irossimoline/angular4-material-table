@@ -112,7 +112,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     source.splice(index, 1);
     this.rowsSubject.next(source);
 
-    this.updateDatasource(source);
+    if(id != -1)
+      this.updateDatasource(source);
   }
 
   /**

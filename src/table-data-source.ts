@@ -44,8 +44,6 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     this.rowsSubject = new BehaviorSubject(this.getRowsFromData(data));
     this.datasourceSubject = new Subject<T[]>();
-
-    this.rowsSubject.subscribe(rows => this.updateDatasource(rows));
   }
 
   /**
@@ -58,8 +56,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       const source = this.rowsSubject.getValue();
       source[row.id] = row;
       this.rowsSubject.next(source);
+
       row.editing = false;
       row.validator.disable();
+
+      this.updateDatasource(source);
     }
   }
 
@@ -73,8 +74,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       const source = this.rowsSubject.getValue();
       row.id = source.length - 1;
       this.rowsSubject.next(source);
+
       row.editing = false;
       row.validator.disable();
+
+      this.updateDatasource(source);
     }
   }
 
@@ -107,6 +111,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     source.splice(index, 1);
     this.rowsSubject.next(source);
+
+    this.updateDatasource(source);
   }
 
   /**

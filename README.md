@@ -16,6 +16,8 @@ Example of using `angular4-material-table`:
 
 ![angular4-material-table](https://i.imgur.com/vncajJG.png)
 
+![Other example](https://i.imgur.com/5ed814s.png)
+
 
 ## Use
 
@@ -57,11 +59,7 @@ class TableDataSource<T> {
 Angular 4 material table use example:
 ![Example of angular4-material-table use](https://i.imgur.com/ath56FU.png)
 
-![Other example](https://i.imgur.com/5ed814s.png)
-
 [See it in action on Plunker](https://plnkr.co/edit/6raFTuv7igsuxi7yOVCg?p=preview)
-
-
 
 #### Optional libraries
 Optional libraries used in the example:

@@ -9,7 +9,7 @@
     "angular material table"
   ],
   "author": "irossimoline",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "MIT",
   "scripts": {
     "transpile": "ngc",

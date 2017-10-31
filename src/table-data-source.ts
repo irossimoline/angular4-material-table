@@ -17,6 +17,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   private dataConstructor: new () => T;
   private dataKeys: any[];
 
+  private currentData: any;
+
   /**
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
    * @param data Array containing the initial values for the TableDataSource. If not specified, then `dataType` must be specified.
@@ -60,7 +62,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       row.editing = false;
       row.validator.disable();
 
-      this.updateDatasource(source);
+      this.updateDatasourceRows(source);
     }
   }
 
@@ -78,7 +80,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       row.editing = false;
       row.validator.disable();
 
-      this.updateDatasource(source);
+      this.updateDatasourceRows(source);
     }
   }
 
@@ -113,14 +115,14 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     this.rowsSubject.next(source);
 
     if(id != -1)
-      this.updateDatasource(source);
+      this.updateDatasourceRows(source);
   }
 
   /**
    * Get the data from the rows.
    * @param rows Rows to extract the data.
    */
-  getDataFromRows(rows: TableElement<T>[]): T[] {
+  private getDataFromRows(rows: TableElement<T>[]): T[] {
     return rows
       .filter(row => row.id != -1)
       .map<T>((row) => {
@@ -129,18 +131,32 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   /**
+   * Update the datasource with a new array of data. If the array reference
+   * is the same as the previous one, it doesn't trigger an update.
+   * @param data 
+   */
+  updateDatasource(data: T[]) {
+    if(this.currentData !== data) {
+      this.currentData = data;
+      this.rowsSubject.next(this.getRowsFromData(data))
+      this.datasourceSubject.next(data);
+    }
+  }
+
+  /**
    * Update the datasource with the data contained in the specified rows.
    * @param rows Rows that contains the datasource's new data.
    */
-  updateDatasource(rows: TableElement<T>[]): void {
-    this.datasourceSubject.next(this.getDataFromRows(rows));
+  private updateDatasourceFromRows(rows: TableElement<T>[]): void {
+    this.currentData = this.getDataFromRows(rows);
+    this.datasourceSubject.next(this.currentData);
   }
 
   /**
    * From an array of data, it returns rows containing the original data.
    * @param data Data from which create the rows.
    */
-  getRowsFromData(data: T[]): TableElement<T>[] {
+  private getRowsFromData(data: T[]): TableElement<T>[] {
     return data.map<TableElement<T>>((data, index) => {
 
       const validator = this.validatorService.getRowValidator();
@@ -162,7 +178,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * an object with the same keys of the first element contained in the original
    * datasource (used in the constructor).
    */
-  createNewObject() {
+  private createNewObject() {
     if (this.dataConstructor)
       return new this.dataConstructor();
     else {

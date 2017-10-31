@@ -62,7 +62,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       row.editing = false;
       row.validator.disable();
 
-      this.updateDatasourceRows(source);
+      this.updateDatasourceFromRows(source);
     }
   }
 
@@ -80,7 +80,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       row.editing = false;
       row.validator.disable();
 
-      this.updateDatasourceRows(source);
+      this.updateDatasourceFromRows(source);
     }
   }
 
@@ -115,7 +115,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     this.rowsSubject.next(source);
 
     if(id != -1)
-      this.updateDatasourceRows(source);
+      this.updateDatasourceFromRows(source);
   }
 
   /**

@@ -50,7 +50,7 @@ class TableElement<T> {
 class TableDataSource<T> {
   datasourceSubject: Subject<T[]>;
 
-  updateDatasource(data: T[]) {
+  updateDatasource(data: T[], options= { emitEvent: true } ) {
 
   createNew();
 }

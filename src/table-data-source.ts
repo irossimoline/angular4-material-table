@@ -130,16 +130,23 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     });
   }
 
+
   /**
    * Update the datasource with a new array of data. If the array reference
    * is the same as the previous one, it doesn't trigger an update.
-   * @param data 
+   * @param data Data to update the table datasource.
+   * @param options Specify options to update the datasource.
+   * If emitEvent is true and the datasource is updated, it emits an event
+   * from 'datasourceSubject' with the updated data. If false, it doesn't
+   * emit an event. True by default.
    */
-  updateDatasource(data: T[]) {
+  updateDatasource(data: T[], options= { emitEvent: true } ) {
     if(this.currentData !== data) {
       this.currentData = data;
       this.rowsSubject.next(this.getRowsFromData(data))
-      this.datasourceSubject.next(data);
+      
+      if(options.emitEvent)
+        this.datasourceSubject.next(data);
     }
   }
 

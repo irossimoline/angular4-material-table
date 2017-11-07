@@ -48,6 +48,13 @@ class TableElement<T> {
 
 ```
 class TableDataSource<T> {
+
+  constructor(
+    data: T[],
+    dataType?: new () => T,
+    validatorService?: ValidatorService,
+    config = { prependNewElements: false });
+
   datasourceSubject: Subject<T[]>;
 
   updateDatasource(data: T[], options= { emitEvent: true } ) {

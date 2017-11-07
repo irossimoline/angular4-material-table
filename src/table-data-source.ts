@@ -24,11 +24,13 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param data Array containing the initial values for the TableDataSource. If not specified, then `dataType` must be specified.
    * @param dataType Type of data contained by the Table. If not specified, then `data` with at least one element must be specified.
    * @param validatorService Service that create instances of the FormGroup used to validate row fields.
+   * @param config Additional configuration for table.
    */
   constructor(
     data: T[],
     dataType?: new () => T,
-    private validatorService?: ValidatorService)
+    private validatorService?: ValidatorService,
+    private config = { prependNewElements: false })
   {
     super();
 
@@ -56,7 +58,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   confirmEdit(row: TableElement<T>) {
     if (row.validator.valid) {
       const source = this.rowsSubject.getValue();
-      source[row.id] = row;
+      const index = this.getIndexFromRowId(row.id, source);
+
+      source[index] = row;
       this.rowsSubject.next(source);
 
       row.editing = false;
@@ -89,15 +93,74 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    */
   createNew() {
     const source = this.rowsSubject.getValue();
-    if (source.length == 0 || source[source.length - 1].id > -1) {
-      source.push(new TableElement({
+    
+    if (!this.existsNewElement(source)) {
+
+      const newElement = new TableElement({
         id: -1,
         editing: true,
         currentData: this.createNewObject(),
         source: this,
         validator: this.validatorService.getRowValidator(),
-      }));
-      this.rowsSubject.next(source);
+      });
+
+      if (this.config.prependNewElements) {
+        this.rowsSubject.next([newElement].concat(source));
+      } else {
+        source.push(newElement);
+        this.rowsSubject.next(source);
+      }
+    }
+  }
+
+  /**
+   * Checks the existance of the a new row (not yet saved).
+   * @param source 
+   */
+  existsNewElement(source: TableElement<T>[]) {
+      return !(source.length == 0 || source[this.getNewRowIndex(source)].id > -1)
+  }
+
+  /**
+   * Returns the possible index of the new row depending on the insertion type.
+   * It doesn't imply that the new row is created, that must be checked.
+   * @param source 
+   */
+  private getNewRowIndex(source): number {
+    if (this.config.prependNewElements)
+      return 0;
+    else
+      return source.length - 1;
+  }
+
+  /**
+   * Returns the row id from the index specified. It does
+   * not consider if the new row is present or not, assumes
+   * that new row is not present.
+   * @param index Index of the array.
+   * @param count Quantity of elements in the array.
+   */
+  private getRowIdFromIndex(index: number, count: number): number {
+    if (this.config.prependNewElements)
+      return count - 1 - index;
+    else
+      return index;
+  }
+
+  /**
+   * Returns the index from the row id specified.
+   * It takes into account if the new row exists or not.
+   * @param id 
+   * @param source
+   */
+  private getIndexFromRowId(id: number, source: TableElement<T>[]): number {
+    if(id == -1) {
+      return this.existsNewElement(source) ? this.getNewRowIndex(source) : -1;
+    } else {
+      if (this.config.prependNewElements)
+          return source.length - 1 - id;
+      else
+        return id;
     }
   }
 
@@ -106,10 +169,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    */
   delete(id: number) {
     const source = this.rowsSubject.getValue();
-
-    const index = id == - 1
-    ? (source.length - 1)
-    : id;
+    const index = this.getIndexFromRowId(id, source);
 
     source.splice(index, 1);
     this.rowsSubject.next(source);
@@ -161,16 +221,16 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   /**
    * From an array of data, it returns rows containing the original data.
-   * @param data Data from which create the rows.
+   * @param arrayData Data from which create the rows.
    */
-  private getRowsFromData(data: T[]): TableElement<T>[] {
-    return data.map<TableElement<T>>((data, index) => {
+  private getRowsFromData(arrayData: T[]): TableElement<T>[] {
+    return arrayData.map<TableElement<T>>((data, index) => {
 
       const validator = this.validatorService.getRowValidator();
       validator.disable();
 
       return new TableElement({
-        id: index,
+        id: this.getRowIdFromIndex(index, arrayData.length),
         editing: false,
         currentData: data,
         source: this,

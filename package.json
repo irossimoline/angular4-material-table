@@ -1,4 +1,5 @@
 {
+  "version": "0.1.6",
   "name": "angular4-material-table",
   "description": "Angular 4 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
   "keywords": [
@@ -9,7 +10,6 @@
     "angular material table"
   ],
   "author": "irossimoline",
-  "version": "0.1.5",
   "license": "MIT",
   "scripts": {
     "transpile": "ngc",

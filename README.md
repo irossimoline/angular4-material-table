@@ -57,7 +57,7 @@ class TableDataSource<T> {
 
   datasourceSubject: Subject<T[]>;
 
-  updateDatasource(data: T[], options= { emitEvent: true } ) {
+  updateDatasource(data: T[], options = { emitEvent: true }): void;
 
   createNew(): void;
 

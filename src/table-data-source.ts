@@ -51,22 +51,27 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   /**
-   * Confirm edition of the row. Save changes and disable editing.
-   * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
-   * @param row Row to be edited.
+   * Start the creation of a new element, pushing an empty-data row in the table.
    */
-  confirmEdit(row: TableElement<T>) {
-    if (row.validator.valid) {
-      const source = this.rowsSubject.getValue();
-      const index = this.getIndexFromRowId(row.id, source);
+  createNew() {
+    const source = this.rowsSubject.getValue();
 
-      source[index] = row;
-      this.rowsSubject.next(source);
+    if (!this.existsNewElement(source)) {
 
-      row.editing = false;
-      row.validator.disable();
+      const newElement = new TableElement({
+        id: -1,
+        editing: true,
+        currentData: this.createNewObject(),
+        source: this,
+        validator: this.validatorService.getRowValidator(),
+      });
 
-      this.updateDatasourceFromRows(source);
+      if (this.config.prependNewElements) {
+        this.rowsSubject.next([newElement].concat(source));
+      } else {
+        source.push(newElement);
+        this.rowsSubject.next(source);
+      }
     }
   }
 
@@ -89,28 +94,39 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   /**
-   * Start the creation of a new element, pushing an empty-data row in the table.
+   * Confirm edition of the row. Save changes and disable editing.
+   * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
+   * @param row Row to be edited.
    */
-  createNew() {
-    const source = this.rowsSubject.getValue();
-    
-    if (!this.existsNewElement(source)) {
+  confirmEdit(row: TableElement<T>) {
+    if (row.validator.valid) {
+      const source = this.rowsSubject.getValue();
+      const index = this.getIndexFromRowId(row.id, source);
 
-      const newElement = new TableElement({
-        id: -1,
-        editing: true,
-        currentData: this.createNewObject(),
-        source: this,
-        validator: this.validatorService.getRowValidator(),
-      });
+      source[index] = row;
+      this.rowsSubject.next(source);
 
-      if (this.config.prependNewElements) {
-        this.rowsSubject.next([newElement].concat(source));
-      } else {
-        source.push(newElement);
-        this.rowsSubject.next(source);
-      }
+      row.editing = false;
+      row.validator.disable();
+
+      this.updateDatasourceFromRows(source);
     }
+  }
+
+  /**
+   * Delete the row with the index specified.
+   */
+  delete(id: number) {
+    const source = this.rowsSubject.getValue();
+    const index = this.getIndexFromRowId(id, source);
+
+    source.splice(index, 1);
+    this.updateRowIds(index, source);
+
+    this.rowsSubject.next(source);
+
+    if (id != -1)
+      this.updateDatasourceFromRows(source);
   }
 
   /**
@@ -124,12 +140,31 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     return (index >= 0 && index < source.length) ? source[index] : null;
   }
 
+  /**
+   * Update the datasource with a new array of data. If the array reference
+   * is the same as the previous one, it doesn't trigger an update.
+   * @param data Data to update the table datasource.
+   * @param options Specify options to update the datasource.
+   * If emitEvent is true and the datasource is updated, it emits an event
+   * from 'datasourceSubject' with the updated data. If false, it doesn't
+   * emit an event. True by default.
+   */
+  updateDatasource(data: T[], options = { emitEvent: true }) {
+    if (this.currentData !== data) {
+      this.currentData = data;
+      this.rowsSubject.next(this.getRowsFromData(data))
+
+      if (options.emitEvent)
+        this.datasourceSubject.next(data);
+    }
+  }
+
 
   /**
    * Checks the existance of the a new row (not yet saved).
    * @param source 
    */
-  existsNewElement(source: TableElement<T>[]) {
+  private existsNewElement(source: TableElement<T>[]) {
       return !(source.length == 0 || source[this.getNewRowIndex(source)].id > -1)
   }
 
@@ -176,23 +211,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
-  /**
-   * Delete the row with the index specified.
-   */
-  delete(id: number) {
-    const source = this.rowsSubject.getValue();
-    const index = this.getIndexFromRowId(id, source);
-
-    source.splice(index, 1);
-    this.updateRowIds(index, source);
-
-    this.rowsSubject.next(source);
-
-    if(id != -1)
-      this.updateDatasourceFromRows(source);
-  }
-
-  updateRowIds(initialIndex: number, source: TableElement<T>[]){
+  private updateRowIds(initialIndex: number, source: TableElement<T>[]){
 
     const delta = this.config.prependNewElements ? -1 : 1;
 
@@ -212,26 +231,6 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       .map<T>((row) => {
       return row.originalData ? row.originalData : row.currentData;
     });
-  }
-
-
-  /**
-   * Update the datasource with a new array of data. If the array reference
-   * is the same as the previous one, it doesn't trigger an update.
-   * @param data Data to update the table datasource.
-   * @param options Specify options to update the datasource.
-   * If emitEvent is true and the datasource is updated, it emits an event
-   * from 'datasourceSubject' with the updated data. If false, it doesn't
-   * emit an event. True by default.
-   */
-  updateDatasource(data: T[], options= { emitEvent: true } ) {
-    if(this.currentData !== data) {
-      this.currentData = data;
-      this.rowsSubject.next(this.getRowsFromData(data))
-      
-      if(options.emitEvent)
-        this.datasourceSubject.next(data);
-    }
   }
 
   /**

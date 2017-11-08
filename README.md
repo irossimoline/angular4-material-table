@@ -39,10 +39,10 @@ class TableElement<T> {
   source: TableDataSource<T>;
   validator: FormGroup;
 
-  delete();
-  confirmEditCreate();
-  startEdit();
-  cancelOrDelete();
+  delete(): void;
+  confirmEditCreate(): boolean;
+  startEdit(): void;
+  cancelOrDelete(): void;
 }
 ```
 
@@ -59,7 +59,9 @@ class TableDataSource<T> {
 
   updateDatasource(data: T[], options= { emitEvent: true } ) {
 
-  createNew();
+  createNew(): void;
+
+  getRow(id: number): TableElement<T>;
 }
 ```
 

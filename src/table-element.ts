@@ -16,25 +16,25 @@ export class TableElement<T> {
     Object.assign(this, init);
   }
 
-  delete() {
+  delete(): void {
     this.source.delete(this.id);
   }
 
-  confirmEditCreate() {
+  confirmEditCreate(): boolean {
     this.originalData = undefined;
     if (this.id == -1)
-      this.source.confirmCreate(this);
+      return this.source.confirmCreate(this);
     else
-      this.source.confirmEdit(this);
+      return this.source.confirmEdit(this);
   }
 
-  startEdit() {
+  startEdit(): void {
     this.originalData = cloneDeep(this.currentData);
     this.editing = true;
     this.validator.enable();
   }
 
-  cancelOrDelete() {
+  cancelOrDelete(): void {
     if (this.id == -1 || !this.editing)
       this.delete();
     else {

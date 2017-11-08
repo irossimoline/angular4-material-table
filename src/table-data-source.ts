@@ -53,7 +53,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
    */
-  createNew() {
+  createNew(): void {
     const source = this.rowsSubject.getValue();
 
     if (!this.existsNewElement(source)) {
@@ -80,17 +80,20 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * If validation active and row data is invalid, it doesn't confirm creation neither disable editing.
    * @param row Row to be confirmed.
    */
-  confirmCreate(row: TableElement<T>) {
-    if (row.validator.valid) {
-      const source = this.rowsSubject.getValue();
-      row.id = source.length - 1;
-      this.rowsSubject.next(source);
-
-      row.editing = false;
-      row.validator.disable();
-
-      this.updateDatasourceFromRows(source);
+  confirmCreate(row: TableElement<T>): boolean {
+    if (!row.validator.valid) {
+      return false
     }
+
+    const source = this.rowsSubject.getValue();
+    row.id = source.length - 1;
+    this.rowsSubject.next(source);
+
+    row.editing = false;
+    row.validator.disable();
+
+    this.updateDatasourceFromRows(source);
+    return true;
   }
 
   /**
@@ -98,25 +101,28 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
    * @param row Row to be edited.
    */
-  confirmEdit(row: TableElement<T>) {
-    if (row.validator.valid) {
-      const source = this.rowsSubject.getValue();
-      const index = this.getIndexFromRowId(row.id, source);
-
-      source[index] = row;
-      this.rowsSubject.next(source);
-
-      row.editing = false;
-      row.validator.disable();
-
-      this.updateDatasourceFromRows(source);
+  confirmEdit(row: TableElement<T>): boolean {
+    if (!row.validator.valid) {
+      return false;
     }
+
+    const source = this.rowsSubject.getValue();
+    const index = this.getIndexFromRowId(row.id, source);
+
+    source[index] = row;
+    this.rowsSubject.next(source);
+
+    row.editing = false;
+    row.validator.disable();
+
+    this.updateDatasourceFromRows(source);
+    return true;
   }
 
   /**
    * Delete the row with the index specified.
    */
-  delete(id: number) {
+  delete(id: number): void {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -149,7 +155,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * from 'datasourceSubject' with the updated data. If false, it doesn't
    * emit an event. True by default.
    */
-  updateDatasource(data: T[], options = { emitEvent: true }) {
+  updateDatasource(data: T[], options = { emitEvent: true }): void {
     if (this.currentData !== data) {
       this.currentData = data;
       this.rowsSubject.next(this.getRowsFromData(data))
@@ -164,7 +170,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * Checks the existance of the a new row (not yet saved).
    * @param source 
    */
-  private existsNewElement(source: TableElement<T>[]) {
+  private existsNewElement(source: TableElement<T>[]): boolean {
       return !(source.length == 0 || source[this.getNewRowIndex(source)].id > -1)
   }
 
@@ -211,7 +217,14 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
-  private updateRowIds(initialIndex: number, source: TableElement<T>[]){
+  /**
+   * Update rows ids in the array specified, starting in the specified index
+   * until the start/end of the array, depending on config.prependNewElements
+   * configuration.
+   * @param initialIndex Initial index of source to be updated.
+   * @param source Array that contains the rows to be updated.
+   */
+  private updateRowIds(initialIndex: number, source: TableElement<T>[]): void {
 
     const delta = this.config.prependNewElements ? -1 : 1;
 
@@ -268,7 +281,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * an object with the same keys of the first element contained in the original
    * datasource (used in the constructor).
    */
-  private createNewObject() {
+  private createNewObject(): T {
     if (this.dataConstructor)
       return new this.dataConstructor();
     else {

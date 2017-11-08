@@ -172,10 +172,22 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     const index = this.getIndexFromRowId(id, source);
 
     source.splice(index, 1);
+    this.updateRowIds(index, source);
+
     this.rowsSubject.next(source);
 
     if(id != -1)
       this.updateDatasourceFromRows(source);
+  }
+
+  updateRowIds(initialIndex: number, source: TableElement<T>[]){
+
+    const delta = this.config.prependNewElements ? -1 : 1;
+
+    for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
+      if (source[index].id != -1)
+        source[index].id = this.getRowIdFromIndex(index, source.length);
+    }
   }
 
   /**

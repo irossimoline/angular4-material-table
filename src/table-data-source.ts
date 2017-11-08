@@ -114,6 +114,18 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   /**
+ * Get row from the table.
+ * @param id Id of the row to retrieve, -1 returns the current new line.
+ */
+  getRow(id: number): TableElement<T> {
+    const source = this.rowsSubject.getValue();
+    const index = this.getIndexFromRowId(id, source);
+
+    return (index >= 0 && index < source.length) ? source[index] : null;
+  }
+
+
+  /**
    * Checks the existance of the a new row (not yet saved).
    * @param source 
    */

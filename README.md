@@ -1,8 +1,10 @@
-# Angular4 material table
+# Angular4 material table (angular4+)
 
 This project extends `@angular/cdk` data-table, also used in `@angular/material` table.
 
 It extends `@angular/cdk/collections` DataSource in order to include a row structure, allowing row creation, inline row edition, deletion and validation.
+
+Currently supports angular 4 (v0.1.8) and angular 5 (v0.2.0).
 
 ## Installation
 

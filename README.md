@@ -72,7 +72,7 @@ class TableDataSource<T> {
 Angular 4 material table use example:
 ![Example of angular4-material-table use](https://i.imgur.com/ath56FU.png)
 
-[See it in action on Plunker](https://plnkr.co/edit/9kZfUW?p=preview)
+[See it in action on Plunker](https://plnkr.co/edit/0z29AOzjv7kMbvikyybh?p=preview)
 
 #### Optional libraries
 Optional libraries used in the example:

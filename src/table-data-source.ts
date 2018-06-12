@@ -1,13 +1,10 @@
 import { DataSource } from '@angular/cdk/collections';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, Subject, Observable } from 'rxjs';
 
 import { TableElement } from './table-element';
 import { ValidatorService } from './validator.service';
 import { DefaultValidatorService } from './default-validator.service';
-
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
@@ -168,7 +165,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   /**
    * Checks the existance of the a new row (not yet saved).
-   * @param source 
+   * @param source
    */
   private existsNewElement(source: TableElement<T>[]): boolean {
       return !(source.length == 0 || source[this.getNewRowIndex(source)].id > -1)
@@ -177,7 +174,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   /**
    * Returns the possible index of the new row depending on the insertion type.
    * It doesn't imply that the new row is created, that must be checked.
-   * @param source 
+   * @param source
    */
   private getNewRowIndex(source): number {
     if (this.config.prependNewElements)
@@ -203,7 +200,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   /**
    * Returns the index from the row id specified.
    * It takes into account if the new row exists or not.
-   * @param id 
+   * @param id
    * @param source
    */
   private getIndexFromRowId(id: number, source: TableElement<T>[]): number {

@@ -21,7 +21,6 @@ export class TableElement<T> {
   }
 
   confirmEditCreate(): boolean {
-    this.originalData = undefined;
     if (this.id == -1)
       return this.source.confirmCreate(this);
     else

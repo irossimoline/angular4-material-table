@@ -109,6 +109,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     source[index] = row;
     this.rowsSubject.next(source);
 
+    row.originalData = undefined;
     row.editing = false;
     row.validator.disable();
 

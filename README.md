@@ -9,6 +9,8 @@ Supported angular versions:
 - Angular 5 (v0.2.0)
 - Angular 6 (v0.6.0)
 
+![angular4-material-table](https://imgur.com/ufilXlv)
+
 ## Installation
 
 To install the package run:

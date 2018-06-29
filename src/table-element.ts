@@ -7,8 +7,8 @@ import cloneDeep from 'lodash.clonedeep';
 export class TableElement<T> {
   id: number;
   editing: boolean;
-  currentData?: T;
-  originalData: T;
+  currentData: T;
+  originalData?: T;
   source: TableDataSource<T>;
   validator: FormGroup;
 

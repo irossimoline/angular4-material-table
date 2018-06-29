@@ -6,9 +6,8 @@ import cloneDeep from 'lodash.clonedeep';
 
 export class TableElement<T> {
   id: number;
-  editing: boolean;
   currentData: T;
-  originalData?: T;
+  editingState: EditingState<T>;
   source: TableDataSource<T>;
   validator: FormGroup;
 
@@ -28,18 +27,33 @@ export class TableElement<T> {
   }
 
   startEdit(): void {
-    this.originalData = cloneDeep(this.currentData);
-    this.editing = true;
+    this.editingState = { kind: StateKind.Editing, originalData: cloneDeep(this.currentData) }
     this.validator.enable();
   }
 
   cancelOrDelete(): void {
-    if (this.id == -1 || !this.editing)
+    if (this.id == -1 || this.editingState.kind === StateKind.NotEditing)
       this.delete();
     else {
-      this.currentData = this.originalData;
-      this.editing = false;
+      this.currentData = this.editingState.originalData;
       this.validator.disable();
     }
   }
+}
+
+export type EditingState<T> = NotEditing<T> | Editing<T>
+
+export enum StateKind { NotEditing, Editing }
+
+export class NotEditing<T> {
+  constructor(
+    readonly kind: StateKind.NotEditing
+  ) { }
+}
+
+export class Editing<T> {
+  constructor(
+    readonly kind: StateKind.Editing,
+    readonly originalData: T
+  ) { }
 }

@@ -20,7 +20,6 @@
     "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
     "build": "npm run transpile && npm run package && npm run minify"
   },
-  "private": true,
   "dependencies": {
     "@angular/common": "^6.0.4",
     "@angular/core": "^6.0.4",

@@ -1,5 +1,5 @@
 {
-  "version": "0.6.6",
+  "version": "0.6.7",
   "name": "angular4-material-table",
   "description": "Angular 4 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
   "keywords": [
@@ -19,6 +19,14 @@
     "package": "rollup -c",
     "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
     "build": "npm run transpile && npm run package && npm run minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/irossimoline/angular4-material-table.git"
+  },
+  "homepage": "https://github.com/irossimoline/angular4-material-table",
+  "bugs": {
+    "url": "https://github.com/irossimoline/angular4-material-table/issues"
   },
   "dependencies": {
     "@angular/common": "^6.0.4",

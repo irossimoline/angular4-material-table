@@ -37,7 +37,7 @@ To use this table, first of all you must check [how use angular `@angular/cdk` d
 Using this extension, you can set CDK data-table `datasource` with an instance of `TableDataSource`.
 
 Using `TableDataSource` allows you to have some row related methods and data to implement add/edit/remove elements:
-```
+```typescript
 class TableElement<T> {
   id: number;
   editing: boolean;
@@ -53,7 +53,7 @@ class TableElement<T> {
 }
 ```
 
-```
+```typescript
 class TableDataSource<T> {
 
   constructor(
@@ -90,7 +90,7 @@ Optional libraries used in the example:
 #### person-list.component.html
 
 
-```
+```html
 <mat-table class="table-margin-bottom" #table [dataSource]="dataSource">
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
@@ -131,7 +131,7 @@ Optional libraries used in the example:
 ```
 
 #### person-list.component.ts
-```
+```typescript
 @Component({
   selector: 'app-person-list',
   providers: [

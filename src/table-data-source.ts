@@ -8,13 +8,13 @@ import { DefaultValidatorService } from './default-validator.service';
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
-  private rowsSubject: BehaviorSubject<TableElement<T>[]>;
+  protected rowsSubject: BehaviorSubject<TableElement<T>[]>;
   datasourceSubject: Subject<T[]>;
 
-  private dataConstructor: new () => T;
-  private dataKeys: any[];
+  protected dataConstructor: new () => T;
+  protected dataKeys: any[];
 
-  private currentData: any;
+  protected currentData: any;
 
   /**
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
@@ -168,7 +168,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * Checks the existance of the a new row (not yet saved).
    * @param source
    */
-  private existsNewElement(source: TableElement<T>[]): boolean {
+  protected existsNewElement(source: TableElement<T>[]): boolean {
       return !(source.length == 0 || source[this.getNewRowIndex(source)].id > -1)
   }
 
@@ -177,7 +177,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * It doesn't imply that the new row is created, that must be checked.
    * @param source
    */
-  private getNewRowIndex(source): number {
+  protected getNewRowIndex(source): number {
     if (this.config.prependNewElements)
       return 0;
     else
@@ -191,7 +191,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param index Index of the array.
    * @param count Quantity of elements in the array.
    */
-  private getRowIdFromIndex(index: number, count: number): number {
+  protected getRowIdFromIndex(index: number, count: number): number {
     if (this.config.prependNewElements)
       return count - 1 - index;
     else
@@ -204,7 +204,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param id
    * @param source
    */
-  private getIndexFromRowId(id: number, source: TableElement<T>[]): number {
+  protected getIndexFromRowId(id: number, source: TableElement<T>[]): number {
     if(id == -1) {
       return this.existsNewElement(source) ? this.getNewRowIndex(source) : -1;
     } else {
@@ -222,7 +222,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param initialIndex Initial index of source to be updated.
    * @param source Array that contains the rows to be updated.
    */
-  private updateRowIds(initialIndex: number, source: TableElement<T>[]): void {
+  protected updateRowIds(initialIndex: number, source: TableElement<T>[]): void {
 
     const delta = this.config.prependNewElements ? -1 : 1;
 
@@ -236,7 +236,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * Get the data from the rows.
    * @param rows Rows to extract the data.
    */
-  private getDataFromRows(rows: TableElement<T>[]): T[] {
+  protected getDataFromRows(rows: TableElement<T>[]): T[] {
     return rows
       .filter(row => row.id != -1)
       .map<T>((row) => {
@@ -248,7 +248,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * Update the datasource with the data contained in the specified rows.
    * @param rows Rows that contains the datasource's new data.
    */
-  private updateDatasourceFromRows(rows: TableElement<T>[]): void {
+  protected updateDatasourceFromRows(rows: TableElement<T>[]): void {
     this.currentData = this.getDataFromRows(rows);
     this.datasourceSubject.next(this.currentData);
   }
@@ -257,7 +257,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * From an array of data, it returns rows containing the original data.
    * @param arrayData Data from which create the rows.
    */
-  private getRowsFromData(arrayData: T[]): TableElement<T>[] {
+  protected getRowsFromData(arrayData: T[]): TableElement<T>[] {
     return arrayData.map<TableElement<T>>((data, index) => {
 
       const validator = this.validatorService.getRowValidator();
@@ -279,7 +279,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * an object with the same keys of the first element contained in the original
    * datasource (used in the constructor).
    */
-  private createNewObject(): T {
+  protected createNewObject(): T {
     if (this.dataConstructor)
       return new this.dataConstructor();
     else {

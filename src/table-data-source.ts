@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 
 import { BehaviorSubject, Subject, Observable } from 'rxjs';
 
-import { TableElement } from './table-element';
+import { TableElement, StateKind } from './table-element';
 import { ValidatorService } from './validator.service';
 import { DefaultValidatorService } from './default-validator.service';
 
@@ -16,6 +16,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   protected currentData: any;
 
+  private validatorService: ValidatorService;
+
   /**
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
    * @param data Array containing the initial values for the TableDataSource. If not specified, then `dataType` must be specified.
@@ -26,12 +28,14 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   constructor(
     data: T[],
     dataType?: new () => T,
-    private validatorService?: ValidatorService,
+    validatorService?: ValidatorService,
     private config = { prependNewElements: false })
   {
     super();
 
-    if (!validatorService)
+    if (validatorService)
+      this.validatorService = validatorService;
+    else
       this.validatorService = new DefaultValidatorService();
 
     if (dataType) {
@@ -57,7 +61,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
       const newElement = new TableElement({
         id: -1,
-        editing: true,
+        editingState: { kind: StateKind.Editing, originalData: this.createNewObject() },
         currentData: this.createNewObject(),
         source: this,
         validator: this.validatorService.getRowValidator(),
@@ -86,7 +90,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     row.id = source.length - 1;
     this.rowsSubject.next(source);
 
-    row.editing = false;
+    row.editingState = { kind: StateKind.NotEditing }
     row.validator.disable();
 
     this.updateDatasourceFromRows(source);
@@ -109,8 +113,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     source[index] = row;
     this.rowsSubject.next(source);
 
-    row.originalData = undefined;
-    row.editing = false;
+    row.editingState = { kind: StateKind.NotEditing }
     row.validator.disable();
 
     this.updateDatasourceFromRows(source);
@@ -137,7 +140,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
  * Get row from the table.
  * @param id Id of the row to retrieve, -1 returns the current new line.
  */
-  getRow(id: number): TableElement<T> {
+  getRow(id: number): TableElement<T> | null {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -240,7 +243,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     return rows
       .filter(row => row.id != -1)
       .map<T>((row) => {
-      return row.originalData ? row.originalData : row.currentData;
+      return row.editingState.kind === StateKind.Editing ? row.editingState.originalData : row.currentData;
     });
   }
 
@@ -265,7 +268,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
       return new TableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
-        editing: false,
+        editingState: { kind: StateKind.NotEditing },
         currentData: data,
         source: this,
         validator: validator,

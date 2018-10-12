@@ -4,7 +4,7 @@
     "declaration": true,
     "stripInternal": true,
     "experimentalDecorators": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "module": "es2015",
     "moduleResolution": "node",

@@ -2,8 +2,9 @@ import { DataSource } from '@angular/cdk/collections';
 
 import { BehaviorSubject, Subject, Observable } from 'rxjs';
 
-import { TableElement } from './table-element';
+import { TableElementFactory } from './table-element.factory';
 import { ValidatorService } from './validator.service';
+import { TableElement } from './table-element';
 import { DefaultValidatorService } from './default-validator.service';
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
@@ -27,7 +28,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     data: T[],
     dataType?: new () => T,
     private validatorService?: ValidatorService,
-    private config = { prependNewElements: false })
+    private config = { prependNewElements: false, suppressErrors: false })
   {
     super();
 
@@ -43,8 +44,27 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         throw new Error('You must define either a non empty array, or an associated class to build the table.');
     }
 
+    this.checkValidatorFields(this.validatorService);
+
     this.rowsSubject = new BehaviorSubject(this.getRowsFromData(data));
     this.datasourceSubject = new Subject<T[]>();
+  }
+
+  protected checkValidatorFields(validatorService: ValidatorService) {
+    const formGroup = validatorService.getRowValidator();
+    if(formGroup != null) {
+      const rowKeys = Object.keys(this.createNewObject());
+      Object.keys(formGroup.controls).forEach(key => {
+        if(rowKeys.some(x => x === key)) {
+          this.logError('Validator form control keys must match row object keys.');
+        }
+      })
+    }
+  }
+
+  protected logError(message: string) {
+    if(!this.config.suppressErrors)
+      console.error(message);
   }
 
   /**
@@ -55,7 +75,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     if (!this.existsNewElement(source)) {
 
-      const newElement = new TableElement({
+      const newElement = TableElementFactory.createTableElement({
         id: -1,
         editing: true,
         currentData: this.createNewObject(),
@@ -78,7 +98,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param row Row to be confirmed.
    */
   confirmCreate(row: TableElement<T>): boolean {
-    if (!row.validator.valid) {
+    if (!row.isValid()) {
       return false
     }
 
@@ -87,7 +107,6 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     this.rowsSubject.next(source);
 
     row.editing = false;
-    row.validator.disable();
 
     this.updateDatasourceFromRows(source);
     return true;
@@ -99,7 +118,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param row Row to be edited.
    */
   confirmEdit(row: TableElement<T>): boolean {
-    if (!row.validator.valid) {
+    if (!row.isValid()) {
       return false;
     }
 
@@ -111,7 +130,6 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     row.originalData = undefined;
     row.editing = false;
-    row.validator.disable();
 
     this.updateDatasourceFromRows(source);
     return true;
@@ -260,15 +278,12 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   protected getRowsFromData(arrayData: T[]): TableElement<T>[] {
     return arrayData.map<TableElement<T>>((data, index) => {
 
-      const validator = this.validatorService.getRowValidator();
-      validator.disable();
-
-      return new TableElement({
+      return TableElementFactory.createTableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
         editing: false,
         currentData: data,
         source: this,
-        validator: validator,
+        validator: this.validatorService.getRowValidator(),
       })
     });
   }
@@ -280,9 +295,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * datasource (used in the constructor).
    */
   protected createNewObject(): T {
-    if (this.dataConstructor)
+    if (this.dataConstructor) {
       return new this.dataConstructor();
-    else {
+    } else {
       return this.dataKeys.reduce((obj, key) => {
         obj[key] = undefined;
         return obj;

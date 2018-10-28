@@ -7,6 +7,6 @@ import { ValidatorService } from './validator.service';
 export class DefaultValidatorService implements ValidatorService {
 
   getRowValidator(): FormGroup {
-    return new FormGroup({});
+    return null;
   }
 }

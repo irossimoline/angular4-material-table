@@ -8,6 +8,7 @@ Supported angular versions:
 - Angular 4 (v0.1.8)
 - Angular 5 (v0.2.0)
 - Angular 6 (v0.6.0)
+- Angular 7 (v0.7.0)
 
 ![angular4-material-table](https://i.imgur.com/ufilXlv.gif)
 
@@ -44,12 +45,13 @@ class TableElement<T> {
   currentData?: T;
   originalData: T;
   source: TableDataSource<T>;
-  validator: FormGroup;
+  validator: FormGroup; // Used only in reactive forms.
 
   delete(): void;
   confirmEditCreate(): boolean;
   startEdit(): void;
   cancelOrDelete(): void;
+  isValid(): boolean; // Used only in reactive forms.
 }
 ```
 
@@ -60,7 +62,7 @@ class TableDataSource<T> {
     data: T[],
     dataType?: new () => T,
     validatorService?: ValidatorService,
-    config = { prependNewElements: false });
+    config = { prependNewElements: false, suppressErrors: false });
 
   datasourceSubject: Subject<T[]>;
 
@@ -87,16 +89,16 @@ Optional libraries used in the example:
 "font-awesome": "4.7.0"
 ```
 
-#### person-list.component.html
+#### person-list-reactive-forms.component.html
 
 
 ```html
-<mat-table class="table-margin-bottom" #table [dataSource]="dataSource">
+<mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input [formControl]="row.validator.controls['name']" [readonly]="!row.editing" placeholder="Name" [(ngModel)]="row.currentData.name" matInput>
+        <input [formControl]="row.validator.controls['name']" placeholder="Name" matInput>
       </mat-form-field>
     </mat-cell>
   </ng-container>
@@ -104,7 +106,50 @@ Optional libraries used in the example:
     <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input [formControl]="row.validator.controls['age']" type="number" placeholder="Age" [(ngModel)]="row.currentData.age" matInput>
+        <input [formControl]="row.validator.controls['age']" type="number" placeholder="Age" matInput>
+      </mat-form-field>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="actionsColumn">
+    <mat-header-cell *matHeaderCellDef>
+      <button mat-icon-button color="accent" (click)="dataSource.createNew()"><i class="fa fa-plus mat-icon"></i></button>
+    </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <button *ngIf="!row.editing" mat-icon-button color="primary" focusable="false" (click)="row.startEdit()">
+            <i class="fa fa-pencil mat-icon"></i>
+          </button>
+      <button *ngIf="row.editing" mat-icon-button color="primary" focusable="false" (click)="row.confirmEditCreate()">
+            <i class="fa fa-check mat-icon"></i>
+          </button>
+      <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
+            <i class="fa fa-times mat-icon"></i>
+          </button>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+```
+
+#### person-list-template-driven.component.html
+
+
+```html
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
+        <input [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing" matInput>
+      </mat-form-field>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="age">
+    <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
+        <input type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing" matInput>
       </mat-form-field>
     </mat-cell>
   </ng-container>

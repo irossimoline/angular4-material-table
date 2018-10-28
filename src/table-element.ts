@@ -1,20 +1,17 @@
 import { FormGroup } from '@angular/forms';
+import cloneDeep from 'lodash.clonedeep';
 
 import { TableDataSource } from './table-data-source';
 
-import cloneDeep from 'lodash.clonedeep';
-
-export class TableElement<T> {
+export abstract class TableElement<T> {
   id: number;
   editing: boolean;
   currentData: T;
   originalData?: T;
   source: TableDataSource<T>;
-  validator: FormGroup;
 
-  constructor(init: Partial<TableElement<T>>) {
-    Object.assign(this, init);
-  }
+  abstract get validator(): FormGroup;
+  abstract set validator(validator: FormGroup);
 
   delete(): void {
     this.source.delete(this.id);
@@ -30,16 +27,16 @@ export class TableElement<T> {
   startEdit(): void {
     this.originalData = cloneDeep(this.currentData);
     this.editing = true;
-    this.validator.enable();
   }
 
-  cancelOrDelete(): void {
+  cancelOrDelete() {
     if (this.id == -1 || !this.editing)
       this.delete();
     else {
       this.currentData = this.originalData;
       this.editing = false;
-      this.validator.disable();
     }
   }
+
+  abstract isValid(): boolean;
 }

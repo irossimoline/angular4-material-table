@@ -10,7 +10,7 @@
     "angular material table"
   ],
   "scripts": {
-    "transpile": "ngc",
+    "transpile": "ngcc",
     "package": "rollup -c",
     "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
     "build": "npm run transpile && npm run package && npm run minify"
@@ -21,6 +21,7 @@
     "@angular/forms": "^9.1.6",
     "@angular/cdk": "^9.1.6",
     "core-js": "^2.6.11",
+    "tslib": "~1.11.2",
     "rxjs": "^6.5.3",
     "zone.js": "^0.10.3",
     "lodash.clonedeep": "^4.5.0"
@@ -34,7 +35,7 @@
     "@types/jasmine": "2.8.9",
     "@types/node": "~10.17.21",
     "codelyzer": "~4.5.0",
-    "rollup": "^0.68.2",
+    "rollup": "^2.9.1",
     "ts-node": "~8.10.1",
     "tslint": "~6.1.2",
     "typescript": "~3.8.3",

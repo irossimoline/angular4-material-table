@@ -10,6 +10,7 @@ Supported angular versions:
 - Angular 6 (v0.6.0)
 - Angular 7 (v0.7.0)
 - Angular 8 (v0.8.0)
+- Angular 9 (v0.9.0)
 
 ![angular4-material-table](https://i.imgur.com/ufilXlv.gif)
 

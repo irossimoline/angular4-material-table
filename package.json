@@ -10,7 +10,7 @@
     "angular material table"
   ],
   "scripts": {
-    "transpile": "ngcc",
+    "transpile": "ngc",
     "package": "rollup -c",
     "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
     "build": "npm run transpile && npm run package && npm run minify"
@@ -39,7 +39,9 @@
     "ts-node": "~8.10.1",
     "tslint": "~6.1.2",
     "typescript": "~3.8.3",
-    "uglify-js": "^3.9.2"
+    "uglify-es": "^3.3.10",
+    "@rollup/plugin-commonjs": "~11.1.0",
+    "@rollup/plugin-node-resolve": "~7.1.3"
   },
   "main": "bundles/angular4-material-table.umd.js",
   "module": "index.js",

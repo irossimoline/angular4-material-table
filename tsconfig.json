@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "declaration": true,
     "stripInternal": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "paths": {
       "@angular/core": ["node_modules/@angular/core"],
       "rxjs/*": ["node_modules/rxjs/*"]
@@ -16,16 +20,13 @@
     "outDir": "dist",
     "sourceMap": true,
     "inlineSources": true,
-    "target": "es5",
+    "target": "es2015",
     "skipLibCheck": true,
     "lib": [
-      "es2015",
+      "es2018",
       "dom"
     ]
   },
-  "files": [
-    "index.ts"
-  ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true
   }

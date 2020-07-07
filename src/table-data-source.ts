@@ -1,11 +1,12 @@
-import { DataSource } from '@angular/cdk/collections';
+import {CollectionViewer, DataSource, ListRange} from '@angular/cdk/collections';
 
-import { BehaviorSubject, Subject, Observable } from 'rxjs';
+import {BehaviorSubject, Observable, Subject, Subscribable, Subscription} from 'rxjs';
 
 import { TableElementFactory } from './table-element.factory';
 import { ValidatorService } from './validator.service';
 import { TableElement } from './table-element';
 import { DefaultValidatorService } from './default-validator.service';
+import {map} from "rxjs/internal/operators";
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
@@ -14,6 +15,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   protected dataConstructor: new () => T;
   protected dataKeys: any[];
+  protected connectedViewers: {
+    viewer: CollectionViewer;
+    subscription: Subscription;
+    range: ListRange;
+  }[] = [];
 
   protected currentData: any;
 
@@ -308,9 +314,43 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   /** Connect function called by the table to retrieve one stream containing
    *  the data to render. */
-  connect(): Observable<TableElement<T>[]> {
+  /*connect(): Observable<TableElement<T>[]> {
     return this.rowsSubject.asObservable();
+  }*/
+
+  connect(collectionViewer: CollectionViewer): Observable<TableElement<T>[] | ReadonlyArray<TableElement<T>>> {
+    const range: ListRange = {
+      start: 0,
+      end: -1
+    }
+    if (collectionViewer){
+      this.connectedViewers.push({
+        viewer: collectionViewer,
+        range,
+        subscription: collectionViewer.viewChange.subscribe(r => {
+          range.start = r.start;
+          range.end = r.end;
+        })
+      });
+    }
+    return this.rowsSubject.asObservable()
+      .pipe(
+        map(data => {
+          if (range.start > 0) {
+            if (range.end > range.start) {
+              return data.slice(range.start, range.end);
+            }
+            return data.slice(range.start);
+          }
+          return data;
+        })
+      );
   }
 
-  disconnect() { }
+  disconnect(collectionViewer: CollectionViewer) {
+    const ref = this.connectedViewers.find(ref => ref.viewer === collectionViewer);
+    if (ref && ref.subscription) {
+      ref.subscription.unsubscribe();
+    }
+  }
 }

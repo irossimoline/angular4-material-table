@@ -6,7 +6,7 @@ import { TableElementFactory } from './table-element.factory';
 import { ValidatorService } from './validator.service';
 import { TableElement } from './table-element';
 import { DefaultValidatorService } from './default-validator.service';
-import {map} from "rxjs/internal/operators";
+import {map} from "rxjs/operators";
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 

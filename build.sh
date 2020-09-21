@@ -36,6 +36,9 @@ npm run build
 [[ $? -ne 0 ]] && exit 1
 
 cp -Rf package*.json dist/
+cp README.md dist/
+
 cd dist
-#npm link rxjs@6.5.5
 npm link
+
+#npm publish . --access public

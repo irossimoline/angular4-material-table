@@ -1,7 +1,7 @@
 {
   "version": "0.10.0",
-  "name": "angular4-material-table",
-  "description": "Angular 4 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
+  "name": "ngx-material-table",
+  "description": "Angular 10 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
   "keywords": [
     "angular",
     "angular4",
@@ -13,14 +13,14 @@
     "postinstall": "ngcc",
     "transpile": "ngc",
     "package": "rollup -c",
-    "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
+    "minify": "uglifyjs dist/bundles/ngx-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/ngx-material-table.umd.min.js",
     "build": "npm run transpile && npm run package && npm run minify"
   },
   "dependencies": {
-    "@angular/common": "^10.0.2",
-    "@angular/core": "^10.0.2",
-    "@angular/forms": "^10.0.2",
-    "@angular/cdk": "^10.0.1",
+    "@angular/common": "^10.0.14",
+    "@angular/core": "^10.0.14",
+    "@angular/forms": "^10.0.14",
+    "@angular/cdk": "^10.0.2",
     "core-js": "^3.6.5",
     "tslib": "~2.0.0",
     "rxjs": "6.4.0",
@@ -44,17 +44,17 @@
     "@rollup/plugin-commonjs": "~11.1.0",
     "@rollup/plugin-node-resolve": "~7.1.3"
   },
-  "main": "bundles/angular4-material-table.umd.js",
+  "main": "bundles/ngx-material-table.umd.js",
   "module": "index.js",
   "typings": "index.d.ts",
   "author": "Ignacio Rossi <irossimoline>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/irossimoline/angular4-material-table.git"
+    "url": "https://github.com/E-IS/ngx-material-table.git"
   },
-  "homepage": "https://github.com/irossimoline/angular4-material-table",
+  "homepage": "https://github.com/E-IS/ngx-material-table",
   "bugs": {
-    "url": "https://github.com/irossimoline/angular4-material-table/issues"
+    "url": "https://github.com/E-IS/ngx-material-table/issues"
   }
 }

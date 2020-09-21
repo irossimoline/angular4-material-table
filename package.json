@@ -51,10 +51,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/E-IS/ngx-material-table.git"
+    "url": "https://github.com/e-is/ngx-material-table.git"
   },
-  "homepage": "https://github.com/E-IS/ngx-material-table",
+  "homepage": "https://github.com/e-is/ngx-material-table",
   "bugs": {
-    "url": "https://github.com/E-IS/ngx-material-table/issues"
+    "url": "https://github.com/e-is/ngx-material-table/issues"
   }
 }

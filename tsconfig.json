@@ -1,6 +1,9 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "inlineSources": true,
     "declaration": true,
     "stripInternal": true,
     "experimentalDecorators": true,
@@ -10,21 +13,12 @@
     "module": "esnext",
     "moduleResolution": "node",
     "typeRoots": [
-      "node_modules/@types"
+        "node_modules/@types"
     ],
-    "paths": {
-      "@angular/core": ["node_modules/@angular/core"],
-      "rxjs/*": ["node_modules/rxjs/*"]
-    },
-    "rootDir": ".",
-    "outDir": "dist",
-    "sourceMap": true,
-    "inlineSources": true,
     "target": "es2015",
-    "skipLibCheck": true,
     "lib": [
-      "es2018",
-      "dom"
+        "es2018",
+        "dom"
     ]
   },
   "angularCompilerOptions": {

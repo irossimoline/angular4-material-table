@@ -18,10 +18,12 @@ export abstract class TableElement<T> {
   }
 
   confirmEditCreate(): boolean {
-    if (this.id == -1)
+    if (this.id === -1) {
       return this.source.confirmCreate(this);
-    else
+    }
+    else {
       return this.source.confirmEdit(this);
+    }
   }
 
   startEdit(): void {

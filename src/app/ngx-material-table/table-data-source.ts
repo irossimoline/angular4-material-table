@@ -6,7 +6,7 @@ import { TableElementFactory } from './table-element.factory';
 import { ValidatorService } from './validator.service';
 import { TableElement } from './table-element';
 import { DefaultValidatorService } from './default-validator.service';
-import {map} from "rxjs/operators";
+import {map} from 'rxjs/operators';
 
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
@@ -34,20 +34,21 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     data: T[],
     dataType?: new () => T,
     private validatorService?: ValidatorService,
-    private config = { prependNewElements: false, suppressErrors: false })
-  {
+    private config = { prependNewElements: false, suppressErrors: false }) {
     super();
 
-    if (!validatorService)
+    if (!validatorService) {
       this.validatorService = new DefaultValidatorService();
+    }
 
     if (dataType) {
       this.dataConstructor = dataType;
     } else {
-      if (data && data.length > 0)
+      if (data && data.length > 0) {
         this.dataKeys = Object.keys(data[0]);
-      else
+      } else {
         throw new Error('You must define either a non empty array, or an associated class to build the table.');
+      }
     }
 
     this.checkValidatorFields(this.validatorService);

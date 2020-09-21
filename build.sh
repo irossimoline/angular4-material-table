@@ -39,5 +39,3 @@ cp -Rf package*.json README.md dist/
 
 cd dist
 npm link
-
-#npm publish . --access public

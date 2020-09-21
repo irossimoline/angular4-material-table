@@ -1,4 +1,4 @@
-# Angular material table (angular4+)
+# Angular material table (Angular 10+)
 
 **Forked from [angular4-material-table](https://github.com/irossimoline/angular4-material-table)**
 

@@ -1,10 +1,11 @@
 {
+  "name": "@e-is/ngx-material-table",
   "version": "0.10.0",
-  "name": "ngx-material-table",
   "description": "Angular 10 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
   "keywords": [
     "angular",
     "angular4",
+    "angular10",
     "table",
     "inline validation",
     "angular material table"

@@ -35,8 +35,7 @@ rm -rf dist
 npm run build
 [[ $? -ne 0 ]] && exit 1
 
-cp -Rf package*.json dist/
-cp README.md dist/
+cp -Rf package*.json README.md dist/
 
 cd dist
 npm link

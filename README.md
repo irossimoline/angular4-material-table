@@ -10,19 +10,19 @@ Supported angular versions:
 - Angular <= 9: Please use [angular4-material-table](https://github.com/irossimoline/angular4-material-table)
 - Angular 10 (v0.10.0)
 
-![ngx-material-table](https://i.imgur.com/ufilXlv.gif)
+![@e-is/ngx-material-table](https://i.imgur.com/ufilXlv.gif)
 
 ## Installation
 
 To install the package run:
 
-`npm install ngx-material-table`
+`npm install @e-is/ngx-material-table`
 
 ## Example
 
-Example of using `ngx-material-table`:
+Example of using `@e-is/ngx-material-table`:
 
-![ngx-material-table](https://i.imgur.com/vncajJG.png)
+![@e-is/ngx-material-table](https://i.imgur.com/vncajJG.png)
 
 ![Other example](https://i.imgur.com/5ed814s.png)
 
@@ -76,16 +76,16 @@ class TableDataSource<T> {
 
 ### Angular4 material table example
 
-Angular 4 material table use example:
-![Example of ngx-material-table use](https://i.imgur.com/ath56FU.png)
+Angular material table use example:
+![Example of @e-is/ngx-material-table use](https://i.imgur.com/ath56FU.png)
 
 [See this package in action](https://stackblitz.com/edit/angular-tj9f6y)
 
 #### Optional libraries
 Optional libraries used in the example:
 ```
-"@angular/material": "2.0.0-beta.12",
-"@angular/forms": "4.4.4", // <- For inline validation
+"@angular/material": "10.0.2",
+"@angular/forms": "10.0.2", // <- For inline validation
 "font-awesome": "4.7.0"
 ```
 

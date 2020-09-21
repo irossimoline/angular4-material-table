@@ -39,18 +39,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-4material-table:build"
+            "browserTarget": "ngx-material-table:build"
           },
           "configurations": {
             "prod": {
-              "browserTarget": "angular-4material-table:build:prod"
+              "browserTarget": "ngx-material-table:build:prod"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-4material-table:build"
+            "browserTarget": "ngx-material-table:build"
           }
         },
         "test": {
@@ -106,7 +106,7 @@
       }
     }
   },
-  "defaultProject": "angular-4material-table",
+  "defaultProject": "ngx-material-table",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

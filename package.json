@@ -1,7 +1,7 @@
 {
   "name": "@e-is/ngx-material-table",
-  "description": "Angular 10 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
-  "version": "0.11.0",
+  "description": "Angular 11 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
+  "version": "0.11.1",
   "license": "MIT",
   "author": "Ignacio Rossi <irossimoline>",
   "keywords": [
@@ -28,7 +28,7 @@
     "build": "ng build --prod",
     "lint": "ng lint",
     "packagr": "ng-packagr -p ng-package.json",
-    "publish": "run-s packagr && npm publish dist"
+    "publish": "run-s packagr && npm publish dist --access public"
   },
   "main": "bundles/ngx-material-table.umd.js",
   "module": "index.js",
@@ -58,7 +58,7 @@
     "codelyzer": "~6.0.1",
     "core-js": "^3.8.0",
     "material-design-icons": "^3.0.1",
-    "ng-packagr": "^5.2.0",
+    "ng-packagr": "^11.0.3",
     "sass": "^1.29.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^2.34.0",

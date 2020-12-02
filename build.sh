@@ -27,7 +27,6 @@ else
 fi
 
 
-#npm link rxjs@6.5.5
 npm install
 [[ $? -ne 0 ]] && exit 1
 

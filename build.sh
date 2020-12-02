@@ -26,7 +26,6 @@ else
   exit 1
 fi
 
-
 npm install
 [[ $? -ne 0 ]] && exit 1
 

@@ -28,7 +28,11 @@
     "build": "ng build --prod",
     "lint": "ng lint",
     "packagr": "ng-packagr -p ng-package.json",
-    "publish": "run-s packagr && npm publish dist --access public"
+    "publish": "run-s packagr && npm publish dist"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "main": "bundles/ngx-material-table.umd.js",
   "module": "index.js",

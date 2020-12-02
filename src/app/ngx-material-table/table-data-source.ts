@@ -58,14 +58,14 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   protected checkValidatorFields(validatorService: ValidatorService) {
+    if (!this.config.suppressErrors) return; // Skip, as error will not be logged
     const formGroup = validatorService.getRowValidator();
     if(formGroup != null) {
       const rowKeys = Object.keys(this.createNewObject());
-      Object.keys(formGroup.controls).forEach(key => {
-        if(rowKeys.some(x => x === key)) {
-          this.logError('Validator form control keys must match row object keys.');
-        }
-      })
+      const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
+      if (invalidKeys.length > 0) {
+        this.logError('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
+      }
     }
   }
 

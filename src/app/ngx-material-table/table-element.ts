@@ -5,11 +5,13 @@ import { TableDataSource } from './table-data-source';
 
 export abstract class TableElement<T> {
   id: number;
-  editing: boolean;
-  currentData: T;
   originalData?: T;
   source: TableDataSource<T>;
 
+  abstract get editing(): boolean;
+  abstract set editing(editing: boolean);
+  abstract get currentData(): T;
+  abstract set currentData(currentData: T);
   abstract get validator(): FormGroup;
   abstract set validator(validator: FormGroup);
 

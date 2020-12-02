@@ -9,6 +9,7 @@ It extends `@angular/cdk/collections` DataSource in order to include a row struc
 Supported angular versions: 
 - Angular <= 9: Please use [angular4-material-table](https://github.com/irossimoline/angular4-material-table)
 - Angular 10 (v0.10.0)
+- Angular 11 (v0.11.0)
 
 ![@e-is/ngx-material-table](https://i.imgur.com/ufilXlv.gif)
 
@@ -84,8 +85,8 @@ Angular material table use example:
 #### Optional libraries
 Optional libraries used in the example:
 ```
-"@angular/material": "10.0.2",
-"@angular/forms": "10.0.2", // <- For inline validation
+"@angular/material": "11.0.1",
+"@angular/forms": "11.0.2", // <- For inline validation
 "font-awesome": "4.7.0"
 ```
 

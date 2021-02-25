@@ -31,6 +31,9 @@
       <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
         <mat-icon>delete</mat-icon>
       </button>
+      <button mat-icon-button color="secondary" focusable="false" (click)="row.cancelOrDelete({restoreOriginalData:true})">
+        <mat-icon>delete</mat-icon>
+      </button>
     </mat-cell>
   </ng-container>
 

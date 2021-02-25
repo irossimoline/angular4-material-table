@@ -44,7 +44,8 @@ class TableElement<T> {
   id: number;
   editing: boolean;
   currentData?: T;
-  originalData: T;
+  previousData?: T;
+  originalData?: T;
   source: TableDataSource<T>;
   validator: FormGroup; // Used only in reactive forms.
 

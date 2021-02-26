@@ -28,8 +28,7 @@ export class PersonListComponent implements OnInit {
       this.personValidator,
       {
         prependNewElements: false,
-        suppressErrors: !environment.production,
-        keepOriginalDataAfterConfirm: false
+        suppressErrors: !environment.production
       });
 
     this.dataSource.datasourceSubject.subscribe(personList => this.personListChange.emit(personList));

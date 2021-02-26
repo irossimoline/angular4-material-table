@@ -6,6 +6,19 @@ import {TableElement} from './table-element';
 import {DefaultValidatorService} from './default-validator.service';
 import {map} from 'rxjs/operators';
 
+/**
+ * TableDataSourceOptions:
+ * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
+ * suppressErrors: if true, no error log
+ * keepOriginalDataAfterConfirm: if true, a modified row always keeps its first original data;
+ *                               otherwise the original data is erased every edition start
+ */
+export interface TableDataSourceOptions {
+  prependNewElements?: boolean;
+  suppressErrors?: boolean;
+  keepOriginalDataAfterConfirm?: boolean;
+}
+
 export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   protected rowsSubject: BehaviorSubject<TableElement<T>[]>;
@@ -20,6 +33,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }[] = [];
 
   protected currentData: any;
+  private config: TableDataSourceOptions;
 
   /**
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
@@ -32,12 +46,15 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     data: T[],
     dataType?: new () => T,
     private readonly validatorService?: ValidatorService,
-    private config = {
+    config?: TableDataSourceOptions) {
+    super();
+
+    this.config = {
       prependNewElements: false,
       suppressErrors: false,
-      keepOriginalDataAfterConfirm: false
-    }) {
-    super();
+      keepOriginalDataAfterConfirm: false,
+      ... config
+    };
 
     if (!validatorService) {
       this.validatorService = new DefaultValidatorService();

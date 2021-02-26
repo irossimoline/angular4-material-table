@@ -108,12 +108,10 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     if (!this.existsNewElement(source)) {
 
-      const data = this.createNewObject();
       const newElement = TableElementFactory.createTableElement({
         id: -1,
         editing: true,
-        originalData: data,
-        currentData: data,
+        currentData: this.createNewObject(),
         source: this,
         validator: this.validatorService.getRowValidator()
       });
@@ -141,6 +139,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     row.id = source.length - 1;
     this.rowsSubject.next(source);
 
+    if (this._config.keepOriginalDataAfterConfirm) {
+      row.originalData = row.currentData;
+    }
     row.editing = false;
 
     this.updateDatasourceFromRows(source);
@@ -324,7 +325,6 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       return TableElementFactory.createTableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
         editing: false,
-        originalData: data,
         currentData: data,
         source: this,
         validator: this.validatorService.getRowValidator()

@@ -8,7 +8,6 @@ export abstract class TableElement<T> {
   id: number;
   originalData?: T;
   source: TableDataSource<T>;
-  keepOriginalDataAfterConfirm: boolean;
 
   abstract get editing(): boolean;
   abstract set editing(editing: boolean);
@@ -32,7 +31,7 @@ export abstract class TableElement<T> {
   }
 
   startEdit(): void {
-    if (!this.originalData || !this.keepOriginalDataAfterConfirm) {
+    if (!this.originalData || !this.source.config.keepOriginalDataAfterConfirm) {
       this.originalData = cloneDeep(this.currentData);
     }
     this.editing = true;

@@ -33,7 +33,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }[] = [];
 
   protected currentData: any;
-  private config: TableDataSourceOptions;
+  private readonly _config: TableDataSourceOptions;
+
+  get config(): TableDataSourceOptions {
+    return this._config;
+  }
 
   /**
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
@@ -49,7 +53,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     config?: TableDataSourceOptions) {
     super();
 
-    this.config = {
+    this._config = {
       prependNewElements: false,
       suppressErrors: false,
       keepOriginalDataAfterConfirm: false,
@@ -77,7 +81,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   protected checkValidatorFields(validatorService: ValidatorService) {
-    if (!this.config.suppressErrors) {
+    if (!this._config.suppressErrors) {
       return;
     } // Skip, as error will not be logged
     const formGroup = validatorService.getRowValidator();
@@ -91,7 +95,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   }
 
   protected logError(message: string) {
-    if (!this.config.suppressErrors) {
+    if (!this._config.suppressErrors) {
       console.error(message);
     }
   }
@@ -111,11 +115,10 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         originalData: data,
         currentData: data,
         source: this,
-        validator: this.validatorService.getRowValidator(),
-        keepOriginalDataAfterConfirm: this.config.keepOriginalDataAfterConfirm
+        validator: this.validatorService.getRowValidator()
       });
 
-      if (this.config.prependNewElements) {
+      if (this._config.prependNewElements) {
         this.rowsSubject.next([newElement].concat(source));
       } else {
         source.push(newElement);
@@ -160,7 +163,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     source[index] = row;
     this.rowsSubject.next(source);
 
-    if (!this.config.keepOriginalDataAfterConfirm) {
+    if (!this._config.keepOriginalDataAfterConfirm) {
       row.originalData = undefined;
     }
     row.editing = false;
@@ -232,7 +235,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param source
    */
   protected getNewRowIndex(source): number {
-    if (this.config.prependNewElements) {
+    if (this._config.prependNewElements) {
       return 0;
     } else {
       return source.length - 1;
@@ -247,7 +250,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param count Quantity of elements in the array.
    */
   protected getRowIdFromIndex(index: number, count: number): number {
-    if (this.config.prependNewElements) {
+    if (this._config.prependNewElements) {
       return count - 1 - index;
     } else {
       return index;
@@ -264,7 +267,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     if (id === -1) {
       return this.existsNewElement(source) ? this.getNewRowIndex(source) : -1;
     } else {
-      if (this.config.prependNewElements) {
+      if (this._config.prependNewElements) {
         return source.length - 1 - id;
       } else {
         return id;
@@ -281,7 +284,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    */
   protected updateRowIds(initialIndex: number, source: TableElement<T>[]): void {
 
-    const delta = this.config.prependNewElements ? -1 : 1;
+    const delta = this._config.prependNewElements ? -1 : 1;
 
     for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
       if (source[index].id !== -1) {
@@ -298,7 +301,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     return rows
       .filter(row => row.id !== -1)
       .map<T>((row) => {
-        return !this.config.keepOriginalDataAfterConfirm && row.originalData ? row.originalData : row.currentData;
+        return !this._config.keepOriginalDataAfterConfirm && row.originalData ? row.originalData : row.currentData;
       });
   }
 
@@ -324,7 +327,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         originalData: data,
         currentData: data,
         source: this,
-        validator: this.validatorService.getRowValidator(),
+        validator: this.validatorService.getRowValidator()
       });
     });
   }

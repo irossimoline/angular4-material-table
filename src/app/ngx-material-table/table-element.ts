@@ -7,8 +7,8 @@ export abstract class TableElement<T> {
 
   id: number;
   originalData?: T;
-  previousData?: T;
   source: TableDataSource<T>;
+  keepOriginalDataAfterConfirm: boolean;
 
   abstract get editing(): boolean;
   abstract set editing(editing: boolean);
@@ -32,7 +32,9 @@ export abstract class TableElement<T> {
   }
 
   startEdit(): void {
-    this.previousData = cloneDeep(this.currentData);
+    if (!this.originalData || !this.keepOriginalDataAfterConfirm) {
+      this.originalData = cloneDeep(this.currentData);
+    }
     this.editing = true;
   }
 
@@ -41,16 +43,11 @@ export abstract class TableElement<T> {
    * @param opts if restoreOriginalData is true, the original data is restored to current data,
    *      if false (the default), the previous value is restored
    */
-  cancelOrDelete(opts?: { restoreOriginalData: boolean }) {
+  cancelOrDelete() {
     if (this.id === -1 || !this.editing) {
       this.delete();
     } else {
-      if (!opts || opts.restoreOriginalData === false) {
-        this.currentData = this.previousData;
-      } else {
-        this.currentData = this.originalData;
-        this.validator.markAsPristine();
-      }
+      this.currentData = this.originalData;
       this.editing = false;
     }
   }

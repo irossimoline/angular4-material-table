@@ -31,8 +31,12 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   constructor(
     data: T[],
     dataType?: new () => T,
-    private validatorService?: ValidatorService,
-    private config = {prependNewElements: false, suppressErrors: false}) {
+    private readonly validatorService?: ValidatorService,
+    private config = {
+      prependNewElements: false,
+      suppressErrors: false,
+      keepOriginalDataAfterConfirm: false
+    }) {
     super();
 
     if (!validatorService) {
@@ -91,6 +95,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         currentData: data,
         source: this,
         validator: this.validatorService.getRowValidator(),
+        keepOriginalDataAfterConfirm: this.config.keepOriginalDataAfterConfirm
       });
 
       if (this.config.prependNewElements) {
@@ -138,7 +143,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     source[index] = row;
     this.rowsSubject.next(source);
 
-    row.previousData = undefined;
+    if (!this.config.keepOriginalDataAfterConfirm) {
+      row.originalData = undefined;
+    }
     row.editing = false;
 
     this.updateDatasourceFromRows(source);
@@ -274,7 +281,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     return rows
       .filter(row => row.id !== -1)
       .map<T>((row) => {
-        return row.previousData ? row.previousData : row.currentData;
+        return !this.config.keepOriginalDataAfterConfirm && row.originalData ? row.originalData : row.currentData;
       });
   }
 

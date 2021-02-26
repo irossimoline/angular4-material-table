@@ -6,7 +6,7 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
   _currentData: T;
 
   get validator(): any {
-    return null;
+    return undefined;
   }
 
   set validator(value: any) {

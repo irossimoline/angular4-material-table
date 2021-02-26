@@ -2,7 +2,7 @@ import {ValidatorService} from '../ngx-material-table/validator.service';
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import { Person, PersonValidatorService } from './person-list.validator';
 import {TableDataSource} from '../ngx-material-table/table-data-source';
-import {environment} from "../../environments/environment";
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-person-list',
@@ -28,7 +28,8 @@ export class PersonListComponent implements OnInit {
       this.personValidator,
       {
         prependNewElements: false,
-        suppressErrors: !environment.production
+        suppressErrors: !environment.production,
+        keepOriginalDataAfterConfirm: false
       });
 
     this.dataSource.datasourceSubject.subscribe(personList => this.personListChange.emit(personList));

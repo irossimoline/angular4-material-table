@@ -40,8 +40,6 @@ export abstract class TableElement<T> {
 
   /**
    * Cancel or delete
-   * @param opts if restoreOriginalData is true, the original data is restored to current data,
-   *      if false (the default), the previous value is restored
    */
   cancelOrDelete() {
     if (this.id === -1 || !this.editing) {

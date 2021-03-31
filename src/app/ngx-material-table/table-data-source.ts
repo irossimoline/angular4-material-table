@@ -5,6 +5,7 @@ import {ValidatorService} from './validator.service';
 import {TableElement} from './table-element';
 import {DefaultValidatorService} from './default-validator.service';
 import {map} from 'rxjs/operators';
+import {moveItemInArray} from '@angular/cdk/drag-drop';
 
 /**
  * TableDataSourceOptions:
@@ -102,8 +103,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
+   * @param insertAt: insert the new element at specified position
    */
-  createNew(): void {
+  createNew(insertAt?: number): void {
     const source = this.rowsSubject.getValue();
 
     if (!this.existsNewElement(source)) {
@@ -116,11 +118,16 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         validator: this.validatorService.getRowValidator()
       });
 
-      if (this._config.prependNewElements) {
-        this.rowsSubject.next([newElement].concat(source));
-      } else {
-        source.push(newElement);
+      if (insertAt) {
+        source.splice(insertAt, 0, newElement);
         this.rowsSubject.next(source);
+      } else {
+        if (this._config.prependNewElements) {
+          this.rowsSubject.next([newElement].concat(source));
+        } else {
+          source.push(newElement);
+          this.rowsSubject.next(source);
+        }
       }
     }
   }
@@ -182,6 +189,28 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     source.splice(index, 1);
     this.updateRowIds(index, source);
+
+    this.rowsSubject.next(source);
+
+    if (id !== -1) {
+      this.updateDatasourceFromRows(source);
+    }
+  }
+
+  /**
+   * Move a row up or down
+   * @param id Id of the row
+   * @param direction Direction: negative value for up, positive value for down
+   */
+  move(id: number, direction: number) {
+    if (direction === 0) {
+      return;
+    }
+
+    const source = this.rowsSubject.getValue();
+    const index = this.getIndexFromRowId(id, source);
+
+    moveItemInArray(source, index, index + direction);
 
     this.rowsSubject.next(source);
 

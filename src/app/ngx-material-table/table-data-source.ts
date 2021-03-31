@@ -211,6 +211,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     const index = this.getIndexFromRowId(id, source);
 
     moveItemInArray(source, index, index + direction);
+    this.updateRowIds(0, source);
 
     this.rowsSubject.next(source);
 

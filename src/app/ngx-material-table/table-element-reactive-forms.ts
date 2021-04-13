@@ -31,7 +31,14 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
     Object.assign(this, init);
   }
 
-  isValid() {
+  isValid(): boolean {
+    if (this.validator.disabled) {
+      // Enable temporarily the validator to get the valid status
+      this.validator.enable();
+      const valid = this.validator.valid;
+      this.validator.disable();
+      return valid;
+    }
     return this.validator.valid;
   }
 }

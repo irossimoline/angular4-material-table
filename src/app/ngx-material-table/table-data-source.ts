@@ -253,11 +253,11 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
 
   /**
-   * Checks the existance of the a new row (not yet saved).
+   * Checks the existence of the a new row (not yet saved).
    * @param source
    */
   protected existsNewElement(source: TableElement<T>[]): boolean {
-    return !(source.length === 0 || source[this.getNewRowIndex(source)].id > -1);
+    return source.length > 0 && this.getNewRowIndex(source) > -1;
   }
 
   /**
@@ -265,12 +265,8 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * It doesn't imply that the new row is created, that must be checked.
    * @param source
    */
-  protected getNewRowIndex(source): number {
-    if (this._config.prependNewElements) {
-      return 0;
-    } else {
-      return source.length - 1;
-    }
+  protected getNewRowIndex(source: TableElement<T>[]): number {
+    return this.getIndexFromRowId(-1, source);
   }
 
   /**
@@ -295,15 +291,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param source
    */
   protected getIndexFromRowId(id: number, source: TableElement<T>[]): number {
-    if (id === -1) {
-      return this.existsNewElement(source) ? this.getNewRowIndex(source) : -1;
-    } else {
-      if (this._config.prependNewElements) {
-        return source.length - 1 - id;
-      } else {
-        return id;
-      }
-    }
+    return source.findIndex(element => element.id === id);
   }
 
   /**
@@ -364,7 +352,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
   /**
    * Create a new object with identical structure than the table source data.
-   * It uses the object's type contructor if available, otherwise it creates
+   * It uses the object's type constructor if available, otherwise it creates
    * an object with the same keys of the first element contained in the original
    * datasource (used in the constructor).
    */

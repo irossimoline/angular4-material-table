@@ -1,7 +1,7 @@
 {
   "name": "@e-is/ngx-material-table",
   "description": "Angular 11 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
-  "version": "0.11.7",
+  "version": "0.11.8",
   "license": "MIT",
   "author": "Ignacio Rossi <irossimoline>",
   "keywords": [
@@ -28,7 +28,8 @@
     "build": "ng build --prod",
     "lint": "ng lint",
     "packagr": "ng-packagr -p ng-package.json",
-    "publish": "run-s packagr && npm publish dist"
+    "publish": "run-s packagr && npm publish dist",
+    "publish-dev": "run-s packagr  && npm publish dist --userconfig=.local/.npmrc"
   },
   "publishConfig": {
     "access": "public",

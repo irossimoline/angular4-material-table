@@ -32,8 +32,7 @@
     "publish-dev": "run-s packagr  && npm publish dist --userconfig=.local/.npmrc"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "access": "public"
   },
   "main": "bundles/ngx-material-table.umd.js",
   "module": "index.js",
@@ -44,9 +43,9 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.6",
-    "@angular/animations": "^11.0.6",
-    "@angular/cdk": "^11.0.3",
-    "@angular/cli": "^11.0.6",
+    "@angular/animations": "^11.0.9",
+    "@angular/cdk": "^11.0.4",
+    "@angular/cli": "^11.0.7",
     "@angular/common": "^11.0.6",
     "@angular/compiler": "^11.0.7",
     "@angular/compiler-cli": "^11.0.7",

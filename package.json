@@ -28,8 +28,8 @@
     "build": "ng build --prod",
     "lint": "ng lint",
     "packagr": "ng-packagr -p ng-package.json",
-    "publish": "run-s packagr && npm publish dist",
-    "publish-dev": "run-s packagr  && npm publish dist --userconfig=.local/.npmrc"
+    "publish": "npm run packagr && cd dist && npm publish",
+    "publish-dev": "npm run packagr && cd dist && npm publish --userconfig=.local/.npmrc"
   },
   "publishConfig": {
     "access": "public"

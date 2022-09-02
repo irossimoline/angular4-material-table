@@ -7,6 +7,7 @@ import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {FormGroup} from "@angular/forms";
 import cloneDeep from 'lodash.clonedeep';
+
 /**
  * TableDataSourceOptions:
  * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
@@ -282,8 +283,10 @@ export class TableDataSource<T,
     const editingRows = this.getEditingRows(source);
     if (editingRows.length === 0) return true; // No row to confirm
 
-    const confirmResults = editingRows
-      .map(row => this.confirmEditCreate(row, {emitEvent: false /*avoid to call updateDatasourceFromRows() - called just after */});
+    // Try to confirm each rows
+    const confirmResults = editingRows.map(row => this.confirmEditCreate(row, {
+        emitEvent: false // Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after
+      }));
 
     // Update datasource, if some rows has been confirmed (=changed)
     const confirmedRowCount = confirmResults.filter(ok => ok).length
@@ -468,7 +471,7 @@ export class TableDataSource<T,
    * @param count
    * @protected
    */
-  protected async createRowValidators(count: number, options = {editing: false}): FormGroup[] {
+  protected createRowValidators(count: number, options = {editing: false}): FormGroup[] {
     const validators = new Array<FormGroup>(count);
     for (let i = 0; i<count; i++) {
       validators[i] = this.createRowValidator(options);

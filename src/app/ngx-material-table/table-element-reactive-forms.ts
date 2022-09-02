@@ -25,6 +25,18 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
     }
   }
 
+  get valid(): boolean {
+    return this.validator.valid;
+  }
+
+  get pending(): boolean {
+    return this.validator.pending;
+  }
+
+  get invalid(): boolean {
+    return this.validator.invalid;
+  }
+
   constructor(init: Partial<TableElementReactiveForms<T>>) {
     super();
     this.validator = init.validator;

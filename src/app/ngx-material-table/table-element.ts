@@ -1,5 +1,4 @@
 import {FormGroup} from '@angular/forms';
-import cloneDeep from 'lodash.clonedeep';
 
 import {TableDataSource} from './table-data-source';
 
@@ -18,36 +17,37 @@ export abstract class TableElement<T> {
   abstract get validator(): FormGroup;
   abstract set validator(validator: FormGroup);
 
-  delete(): void {
-    this.source.delete(this.id);
+  delete(): boolean {
+    return this.source.delete(this.id);
   }
 
   confirmEditCreate(): boolean {
-    if (this.id === -1) {
-      return this.source.confirmCreate(this);
-    } else {
-      return this.source.confirmEdit(this);
-    }
-  }
-
-  startEdit(): void {
-    if (!this.originalData || !this.source.config.keepOriginalDataAfterConfirm) {
-      this.originalData = cloneDeep(this.currentData);
-    }
-    this.editing = true;
+    return this.source.confirmEditCreate(this);
   }
 
   /**
    * Cancel or delete
    */
-  cancelOrDelete() {
-    if (this.id === -1 || !this.editing) {
-      this.delete();
-    } else {
-      this.currentData = this.originalData;
-      this.editing = false;
-    }
+  cancelOrDelete(): boolean {
+    return this.source.cancelOrDelete(this);
   }
 
+  cancel(): boolean {
+    return this.source.cancel(this);
+  }
+
+  startEdit(): boolean {
+    return this.source.startEdit(this);
+  }
+
+  abstract get valid(): boolean;
+
+  abstract get pending(): boolean;
+
+  abstract get invalid(): boolean;
+
+  /**
+   * Check if the row is valid. Use Promise to allow async validator to finish
+   */
   abstract isValid(): boolean;
 }

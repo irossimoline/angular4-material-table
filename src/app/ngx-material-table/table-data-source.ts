@@ -3,10 +3,10 @@ import {BehaviorSubject, Observable, Subject, Subscription} from 'rxjs';
 import {TableElementFactory} from './table-element.factory';
 import {ValidatorService} from './validator.service';
 import {TableElement} from './table-element';
-import {DefaultValidatorService} from './default-validator.service';
-import {map} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
-
+import {FormGroup} from "@angular/forms";
+import cloneDeep from 'lodash.clonedeep';
 /**
  * TableDataSourceOptions:
  * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
@@ -20,11 +20,18 @@ export interface TableDataSourceOptions {
   keepOriginalDataAfterConfirm?: boolean;
 }
 
-export class TableDataSource<T> extends DataSource<TableElement<T>> {
+export class TableDataSource<T,
+  V extends ValidatorService = ValidatorService,
+  O extends TableDataSourceOptions = TableDataSourceOptions
+  > extends DataSource<TableElement<T>> {
 
-  protected rowsSubject: BehaviorSubject<TableElement<T>[]>;
+
+  /**
+   * Return the data array, of confirmed rows (currentData)
+   */
   datasourceSubject: Subject<T[]>;
 
+  protected rowsSubject: BehaviorSubject<TableElement<T>[]>;
   protected dataConstructor: new () => T;
   protected dataKeys: any[];
   protected connectedViewers: {
@@ -32,11 +39,10 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     subscription: Subscription;
     range: ListRange;
   }[] = [];
-
   protected currentData: any;
-  private readonly _config: TableDataSourceOptions;
+  private readonly _config: O;
 
-  get config(): TableDataSourceOptions {
+  get config(): O {
     return this._config;
   }
 
@@ -50,20 +56,16 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   constructor(
     data: T[],
     dataType?: new () => T,
-    private readonly validatorService?: ValidatorService,
-    config?: TableDataSourceOptions) {
+    protected validatorService?: V,
+    config?: O) {
     super();
 
     this._config = {
       prependNewElements: false,
       suppressErrors: false,
       keepOriginalDataAfterConfirm: false,
-      ... config
+      ...config
     };
-
-    if (!validatorService) {
-      this.validatorService = new DefaultValidatorService();
-    }
 
     if (dataType) {
       this.dataConstructor = dataType;
@@ -75,17 +77,17 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
       }
     }
 
-    this.checkValidatorFields(this.validatorService);
+    this.checkValidatorFields();
 
-    this.rowsSubject = new BehaviorSubject(this.getRowsFromData(data));
     this.datasourceSubject = new Subject<T[]>();
+    const rows = this.createRowsFromData(data);
+    this.rowsSubject = new BehaviorSubject(rows);
   }
 
-  protected checkValidatorFields(validatorService: ValidatorService) {
-    if (!this._config.suppressErrors) {
-      return;
-    } // Skip, as error will not be logged
-    const formGroup = validatorService.getRowValidator();
+  protected checkValidatorFields() {
+    if (!this._config.suppressErrors) return; // Skip, as error will not be logged
+
+    const formGroup = this.createRowValidator();
     if (formGroup != null) {
       const rowKeys = Object.keys(this.createNewObject());
       const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
@@ -105,30 +107,48 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * Start the creation of a new element, pushing an empty-data row in the table.
    * @param insertAt: insert the new element at specified position
    */
-  createNew(insertAt?: number): void {
+  createNew(insertAt?: number): boolean {
     const source = this.rowsSubject.getValue();
 
-    if (!this.existsNewElement(source)) {
+    if (this.existsNewElement(source)) return false;
 
-      const newElement = TableElementFactory.createTableElement({
-        id: -1,
-        editing: true,
-        currentData: this.createNewObject(),
-        source: this,
-        validator: this.validatorService.getRowValidator()
-      });
+    const [currentData, validator] = [this.createNewObject(), this.validatorService.getRowValidator()];
 
-      if (insertAt) {
-        source.splice(insertAt, 0, newElement);
-        this.rowsSubject.next(source);
+    const newElement = TableElementFactory.createTableElement({
+      id: -1,
+      editing: true,
+      source: this,
+      currentData,
+      validator
+    });
+
+    if (insertAt) {
+      source.splice(insertAt, 0, newElement);
+      this.rowsSubject.next(source);
+    } else {
+      if (this._config.prependNewElements) {
+        this.rowsSubject.next([newElement].concat(source));
       } else {
-        if (this._config.prependNewElements) {
-          this.rowsSubject.next([newElement].concat(source));
-        } else {
-          source.push(newElement);
-          this.rowsSubject.next(source);
-        }
+        source.push(newElement);
+        this.rowsSubject.next(source);
       }
+    }
+    return true;
+  }
+
+  confirmEditCreate(row: TableElement<T>, options = {emitEvent: true}): boolean {
+    if (row.id === -1) {
+      return this.confirmCreate(row, options);
+    } else {
+      return this.confirmEdit(row, options);
+    }
+  }
+
+  cancelOrDelete(row: TableElement<T>, options = {emitEvent: true}): boolean {
+    if (row.id === -1 || !row.editing) {
+      return this.delete(row.id, options);
+    } else {
+      return this.cancel(row);
     }
   }
 
@@ -137,8 +157,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * If validation active and row data is invalid, it doesn't confirm creation neither disable editing.
    * @param row Row to be confirmed.
    */
-  confirmCreate(row: TableElement<T>): boolean {
-    if (!row.isValid()) {
+  confirmCreate(row: TableElement<T>, options = {emitEvent: true}): boolean {
+    const valid = row.isValid();
+    if (!valid) {
       return false;
     }
 
@@ -151,7 +172,10 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
     row.editing = false;
 
-    this.updateDatasourceFromRows(source);
+    if (options.emitEvent) {
+      this.updateDatasourceFromRows(source);
+    }
+
     return true;
   }
 
@@ -160,8 +184,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
    * @param row Row to be edited.
    */
-  confirmEdit(row: TableElement<T>): boolean {
-    if (!row.isValid()) {
+  confirmEdit(row: TableElement<T>, options = {emitEvent: true}): boolean {
+    const valid = row.isValid();
+    if (!valid) {
       return false;
     }
 
@@ -176,14 +201,25 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
     row.editing = false;
 
-    this.updateDatasourceFromRows(source);
+    if (options.emitEvent) {
+      this.updateDatasourceFromRows(source);
+    }
+    return true;
+  }
+
+  startEdit(row: TableElement<T>): boolean {
+    // Save the original data, to be able to cancel changes
+    if (!row.originalData || !this._config.keepOriginalDataAfterConfirm) {
+      row.originalData = cloneDeep(row.currentData);
+    }
+    row.editing = true;
     return true;
   }
 
   /**
    * Delete the row with the index specified.
    */
-  delete(id: number): void {
+  delete(id: number, options = {emitEvent: true}): boolean {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -192,9 +228,24 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
 
     this.rowsSubject.next(source);
 
-    if (id !== -1) {
+    if (id !== -1 && options.emitEvent) {
       this.updateDatasourceFromRows(source);
     }
+    return true;
+  }
+
+  /**
+   * Restore the original data
+   * @param row
+   */
+  cancel(row: TableElement<T>): boolean {
+    if (row.id === -1) throw new Error('Cannot cancel a newly created row. Please use delete() or cancelOrDelete() instead');
+    if (!row.editing) throw new Error('Cannot cancel a not editing row. Please use delete() or cancelOrDelete() instead');
+
+    row.currentData = row.originalData;
+    row.editing = false;
+
+    return true;
   }
 
   /**
@@ -202,7 +253,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param id Id of the row
    * @param direction Direction: negative value for up, positive value for down
    */
-  move(id: number, direction: number) {
+  move(id: number, direction: number): boolean {
     if (direction === 0) {
       return;
     }
@@ -218,6 +269,30 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     if (id !== -1) {
       this.updateDatasourceFromRows(source);
     }
+    return true;
+  }
+
+  async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
+    return this.confirmRows(this.rowsSubject.getValue())
+  }
+
+  async confirmRows(source: TableElement<T>[], options = {emitEvent: true}): Promise<boolean> {
+
+    // Get editing rows
+    const editingRows = this.getEditingRows(source);
+    if (editingRows.length === 0) return true; // No row to confirm
+
+    const confirmResults = editingRows
+      .map(row => this.confirmEditCreate(row, {emitEvent: false /*avoid to call updateDatasourceFromRows() - called just after */});
+
+    // Update datasource, if some rows has been confirmed (=changed)
+    const confirmedRowCount = confirmResults.filter(ok => ok).length
+    if (confirmedRowCount && options.emitEvent) {
+      this.updateDatasourceFromRows(this.rowsSubject.getValue())
+    }
+
+    // Return if all rows has been confirmed
+    return confirmedRowCount === confirmResults.length;
   }
 
   /**
@@ -243,7 +318,9 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   updateDatasource(data: T[], options = {emitEvent: true}): void {
     if (this.currentData !== data) {
       this.currentData = data;
-      this.rowsSubject.next(this.getRowsFromData(data));
+
+      const rows = this.createRowsFromData(data);
+      this.rowsSubject.next(rows);
 
       if (options.emitEvent) {
         this.datasourceSubject.next(data);
@@ -251,13 +328,19 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
     }
   }
 
-
   /**
    * Checks the existence of the a new row (not yet saved).
    * @param source
    */
   protected existsNewElement(source: TableElement<T>[]): boolean {
     return source.length > 0 && this.getNewRowIndex(source) > -1;
+  }
+
+  /**
+   * Get not saved rows
+   */
+  protected getEditingRows(source: TableElement<T>[]): TableElement<T>[] {
+    return source.filter(row => row.editing);
   }
 
   /**
@@ -315,12 +398,13 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
   /**
    * Get the data from the rows.
    * @param rows Rows to extract the data.
+   * @param options
    */
-  protected getDataFromRows(rows: TableElement<T>[]): T[] {
+  protected getDataFromRows(rows: TableElement<T>[], options = {originalData: false}): T[] {
     return rows
       .filter(row => row.id !== -1)
       .map<T>((row) => {
-        return !this._config.keepOriginalDataAfterConfirm && row.originalData ? row.originalData : row.currentData;
+        return options.originalData && row.originalData ? row.originalData : row.currentData;
       });
   }
 
@@ -329,7 +413,7 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * @param rows Rows that contains the datasource's new data.
    */
   protected updateDatasourceFromRows(rows: TableElement<T>[]): void {
-    this.currentData = this.getDataFromRows(rows);
+    this.currentData = this.getDataFromRows(rows, {originalData: !this._config.keepOriginalDataAfterConfirm});
     this.datasourceSubject.next(this.currentData);
   }
 
@@ -337,15 +421,18 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
    * From an array of data, it returns rows containing the original data.
    * @param arrayData Data from which create the rows.
    */
-  protected getRowsFromData(arrayData: T[]): TableElement<T>[] {
-    return arrayData.map<TableElement<T>>((data, index) => {
+  protected createRowsFromData(arrayData: T[]): TableElement<T>[] {
 
+    // Create many validators (batch mode)
+    const validators = this.createRowValidators(arrayData.length, {editing: false});
+
+    return arrayData.map<TableElement<T>>((data, index) => {
       return TableElementFactory.createTableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
         editing: false,
         currentData: data,
         source: this,
-        validator: this.validatorService.getRowValidator()
+        validator: validators[index]
       });
     });
   }
@@ -365,33 +452,53 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
         return obj;
       }, {});
     }
+  }
 
+  protected createRowValidator(options = {editing: false}): FormGroup {
+    if (!this.validatorService) return null;
+    const validator = this.validatorService.getRowValidator();
+    if (!options.editing){
+      validator.disable({emitEvent: false});
+    }
+    return validator;
+  }
+
+  /**
+   * Create many validators (batch mode)
+   * @param count
+   * @protected
+   */
+  protected async createRowValidators(count: number, options = {editing: false}): FormGroup[] {
+    const validators = new Array<FormGroup>(count);
+    for (let i = 0; i<count; i++) {
+      validators[i] = this.createRowValidator(options);
+    }
+    return validators;
   }
 
   /** Connect function called by the table to retrieve one stream containing
    *  the data to render. */
-
-  /*connect(): Observable<TableElement<T>[]> {
-    return this.rowsSubject.asObservable();
-  }*/
-
   connect(collectionViewer: CollectionViewer): Observable<TableElement<T>[] | ReadonlyArray<TableElement<T>>> {
+    // No collection viewer: return all data
+    if (!collectionViewer) {
+      return this.rowsSubject.asObservable();
+    }
+
     const range: ListRange = {
       start: 0,
       end: -1
     };
-    if (collectionViewer) {
-      this.connectedViewers.push({
-        viewer: collectionViewer,
-        range,
-        subscription: collectionViewer.viewChange.subscribe(r => {
-          range.start = r.start;
-          range.end = r.end;
-        })
-      });
-    }
+    this.connectedViewers.push({
+      viewer: collectionViewer,
+      range,
+      subscription: collectionViewer.viewChange.subscribe(r => {
+        range.start = r.start;
+        range.end = r.end;
+      })
+    });
     return this.rowsSubject.asObservable()
       .pipe(
+        filter(data => data !== null && data !== undefined),
         map(data => {
           if (range.start > 0) {
             if (range.end > range.start) {
@@ -402,12 +509,23 @@ export class TableDataSource<T> extends DataSource<TableElement<T>> {
           return data;
         })
       );
+
+
   }
 
   disconnect(collectionViewer: CollectionViewer) {
-    const ref = this.connectedViewers.find(r => r.viewer === collectionViewer);
-    if (ref && ref.subscription) {
-      ref.subscription.unsubscribe();
+    if (collectionViewer) {
+      const refIndex = this.connectedViewers.findIndex(r => r.viewer === collectionViewer);
+      if (refIndex !== -1) {
+        const ref = this.connectedViewers.splice(refIndex, 1)[0];
+        ref.subscription.unsubscribe();
+      }
+    }
+
+    // Destroy observables
+    if (this.connectedViewers.length === 0) {
+      this.rowsSubject.complete();
+      this.datasourceSubject.complete();
     }
   }
 }

@@ -28,12 +28,24 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
     this._editing = value;
   }
 
+  get valid(): boolean {
+    return true;
+  }
+
+  get invalid(): boolean {
+    return false;
+  }
+
+  get pending(): boolean {
+    return false;
+  }
+
   constructor(init: Partial<TableElementTemplateDriven<T>>) {
     super();
     Object.assign(this, init);
   }
 
-  isValid() {
+  isValid(): boolean {
     return true;
   }
 }

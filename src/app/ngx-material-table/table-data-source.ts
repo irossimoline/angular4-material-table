@@ -6,24 +6,23 @@ import {TableElement} from './table-element';
 import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {FormGroup} from "@angular/forms";
-import cloneDeep from 'lodash.clonedeep';
 
 /**
  * TableDataSourceOptions:
  * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
  * suppressErrors: if true, no error log
- * keepOriginalDataAfterConfirm: if true, a modified row always keeps its first original data;
- *                               otherwise the original data is erased every edition start
+ * restoreOriginalDataOnCancel: if true, canceling a row will restore the original data, otherwise, previous data is restored
  */
-export interface TableDataSourceOptions {
+export interface TableDataSourceConfig {
   prependNewElements?: boolean;
   suppressErrors?: boolean;
-  keepOriginalDataAfterConfirm?: boolean;
+  allowCancel?: boolean;
+  restoreOriginalDataOnCancel?: boolean;
 }
 
 export class TableDataSource<T,
   V extends ValidatorService = ValidatorService,
-  O extends TableDataSourceOptions = TableDataSourceOptions
+  C extends TableDataSourceConfig = TableDataSourceConfig
   > extends DataSource<TableElement<T>> {
 
 
@@ -32,7 +31,11 @@ export class TableDataSource<T,
    */
   datasourceSubject: Subject<T[]>;
 
-  protected rowsSubject: BehaviorSubject<TableElement<T>[]>;
+  /**
+   * Return all existing rows. Please use connect() instead
+   */
+  rowsSubject: BehaviorSubject<TableElement<T>[]>;
+
   protected dataConstructor: new () => T;
   protected dataKeys: any[];
   protected connectedViewers: {
@@ -41,9 +44,9 @@ export class TableDataSource<T,
     range: ListRange;
   }[] = [];
   protected currentData: any;
-  private readonly _config: O;
+  private readonly _config: C;
 
-  get config(): O {
+  get config(): C {
     return this._config;
   }
 
@@ -58,13 +61,14 @@ export class TableDataSource<T,
     data: T[],
     dataType?: new () => T,
     protected validatorService?: V,
-    config?: O) {
+    config?: C) {
     super();
 
     this._config = {
       prependNewElements: false,
       suppressErrors: false,
-      keepOriginalDataAfterConfirm: false,
+      allowCancel: true,
+      restoreOriginalDataOnCancel: false,
       ...config
     };
 
@@ -93,14 +97,8 @@ export class TableDataSource<T,
       const rowKeys = Object.keys(this.createNewObject());
       const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
       if (invalidKeys.length > 0) {
-        this.logError('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
+        console.error('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
       }
-    }
-  }
-
-  protected logError(message: string) {
-    if (!this._config.suppressErrors) {
-      console.error(message);
     }
   }
 
@@ -108,10 +106,10 @@ export class TableDataSource<T,
    * Start the creation of a new element, pushing an empty-data row in the table.
    * @param insertAt: insert the new element at specified position
    */
-  createNew(insertAt?: number): boolean {
+  async createNew(insertAt?: number): Promise<TableElement<T>|undefined> {
     const source = this.rowsSubject.getValue();
 
-    if (this.existsNewElement(source)) return false;
+    if (this.existsNewElement(source)) return;
 
     const [currentData, validator] = [this.createNewObject(), this.validatorService.getRowValidator()];
 
@@ -134,7 +132,7 @@ export class TableDataSource<T,
         this.rowsSubject.next(source);
       }
     }
-    return true;
+    return newElement;
   }
 
   confirmEditCreate(row: TableElement<T>, options = {emitEvent: true}): boolean {
@@ -167,10 +165,6 @@ export class TableDataSource<T,
     const source = this.rowsSubject.getValue();
     row.id = source.length - 1;
     this.rowsSubject.next(source);
-
-    if (this._config.keepOriginalDataAfterConfirm) {
-      row.originalData = row.currentData;
-    }
     row.editing = false;
 
     if (options.emitEvent) {
@@ -197,7 +191,8 @@ export class TableDataSource<T,
     source[index] = row;
     this.rowsSubject.next(source);
 
-    if (!this._config.keepOriginalDataAfterConfirm) {
+    // Reset backup data
+    if (!this._config.restoreOriginalDataOnCancel) {
       row.originalData = undefined;
     }
     row.editing = false;
@@ -210,8 +205,8 @@ export class TableDataSource<T,
 
   startEdit(row: TableElement<T>): boolean {
     // Save the original data, to be able to cancel changes
-    if (!row.originalData || !this._config.keepOriginalDataAfterConfirm) {
-      row.originalData = cloneDeep(row.currentData);
+    if (this._config.allowCancel && (!row.originalData || !this._config.restoreOriginalDataOnCancel)) {
+      row.originalData = row.cloneData();
     }
     row.editing = true;
     return true;
@@ -242,6 +237,7 @@ export class TableDataSource<T,
   cancel(row: TableElement<T>): boolean {
     if (row.id === -1) throw new Error('Cannot cancel a newly created row. Please use delete() or cancelOrDelete() instead');
     if (!row.editing) throw new Error('Cannot cancel a not editing row. Please use delete() or cancelOrDelete() instead');
+    if (!this._config.allowCancel) throw new Error('Cannot cancel a row. Please enable using option \'allowCancel: true\'');
 
     row.currentData = row.originalData;
     row.editing = false;
@@ -403,12 +399,13 @@ export class TableDataSource<T,
    * @param rows Rows to extract the data.
    * @param options
    */
-  protected getDataFromRows(rows: TableElement<T>[], options = {originalData: false}): T[] {
+  protected getDataFromRows(rows: TableElement<T>[]): T[] {
+    const mapToDataFn = this._config.allowCancel && !this._config.restoreOriginalDataOnCancel
+        ? (row => row.originalData || row.currentData)
+        : (row => row.currentData) // Always return currentData, if orginalData is NOT update at each edition
     return rows
       .filter(row => row.id !== -1)
-      .map<T>((row) => {
-        return options.originalData && row.originalData ? row.originalData : row.currentData;
-      });
+      .map<T>(mapToDataFn);
   }
 
   /**
@@ -416,7 +413,7 @@ export class TableDataSource<T,
    * @param rows Rows that contains the datasource's new data.
    */
   protected updateDatasourceFromRows(rows: TableElement<T>[]): void {
-    this.currentData = this.getDataFromRows(rows, {originalData: !this._config.keepOriginalDataAfterConfirm});
+    this.currentData = this.getDataFromRows(rows);
     this.datasourceSubject.next(this.currentData);
   }
 

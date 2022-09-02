@@ -46,11 +46,16 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
   isValid(): boolean {
     if (this.validator.disabled) {
       // Enable temporarily the validator to get the valid status
-      this.validator.enable();
+      this.validator.enable({emitEvent: false, onlySelf: true});
+      this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
       const valid = this.validator.valid;
-      this.validator.disable();
+      this.validator.disable({emitEvent: false, onlySelf: true});
       return valid;
     }
     return this.validator.valid;
+  }
+
+  cloneData(): T {
+    return this.validator.getRawValue();
   }
 }

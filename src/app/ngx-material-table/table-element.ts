@@ -13,6 +13,7 @@ export abstract class TableElement<T> {
 
   abstract get currentData(): T;
   abstract set currentData(currentData: T);
+  abstract cloneData(): T;
 
   abstract get validator(): FormGroup;
   abstract set validator(validator: FormGroup);

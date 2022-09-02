@@ -1,4 +1,5 @@
 import {TableElement} from './table-element';
+import cloneDeep from 'lodash.clonedeep';
 
 export class TableElementTemplateDriven<T> extends TableElement<T> {
 
@@ -47,5 +48,9 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
 
   isValid(): boolean {
     return true;
+  }
+
+  cloneData(): T {
+    return cloneDeep(this.currentData);
   }
 }

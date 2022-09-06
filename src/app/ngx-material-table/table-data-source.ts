@@ -106,30 +106,31 @@ export class TableDataSource<T,
    * Start the creation of a new element, pushing an empty-data row in the table.
    * @param insertAt: insert the new element at specified position
    */
-  async createNew(insertAt?: number): Promise<TableElement<T>|undefined> {
-    const source = this.rowsSubject.getValue();
+  async createNew(insertAt?: number, options = {editing: true}): Promise<TableElement<T>|undefined> {
+    const rows = this.rowsSubject.getValue();
 
-    if (this.existsNewElement(source)) return;
+    if (this.existsNewElement(rows)) return;
 
-    const [currentData, validator] = [this.createNewObject(), this.validatorService.getRowValidator()];
+    const [currentData, validator] = [this.createNewObject(), this.createRowValidator(options)];
 
+    const id = options.editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = TableElementFactory.createTableElement({
-      id: -1,
-      editing: true,
+      id,
+      editing: options.editing,
       source: this,
       currentData,
       validator
     });
 
     if (insertAt) {
-      source.splice(insertAt, 0, newElement);
-      this.rowsSubject.next(source);
+      rows.splice(insertAt, 0, newElement);
+      this.rowsSubject.next(rows);
     } else {
       if (this._config.prependNewElements) {
-        this.rowsSubject.next([newElement].concat(source));
+        this.rowsSubject.next([newElement].concat(rows));
       } else {
-        source.push(newElement);
-        this.rowsSubject.next(source);
+        rows.push(newElement);
+        this.rowsSubject.next(rows);
       }
     }
     return newElement;
@@ -298,7 +299,7 @@ export class TableDataSource<T,
    * Get row from the table.
    * @param id Id of the row to retrieve, -1 returns the current new line.
    */
-  getRow(id: number): TableElement<T> {
+  public getRow(id: number): TableElement<T> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -457,7 +458,7 @@ export class TableDataSource<T,
   protected createRowValidator(options = {editing: false}): FormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
-    if (!options.editing){
+    if (!options.editing) {
       validator.disable({emitEvent: false});
     }
     return validator;

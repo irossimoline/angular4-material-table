@@ -41,6 +41,10 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
     return false;
   }
 
+  get dirty(): boolean {
+    return false;
+  }
+
   constructor(init: Partial<TableElementTemplateDriven<T>>) {
     super();
     Object.assign(this, init);

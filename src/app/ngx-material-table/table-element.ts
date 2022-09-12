@@ -47,6 +47,8 @@ export abstract class TableElement<T> {
 
   abstract get invalid(): boolean;
 
+  abstract get dirty(): boolean;
+
   /**
    * Check if the row is valid. Use Promise to allow async validator to finish
    */

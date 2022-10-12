@@ -1,6 +1,6 @@
-import {firstValueFrom, Observable, timer} from 'rxjs';
+import {Observable, timer} from 'rxjs';
 import {AbstractControl} from '@angular/forms';
-import {filter, map, takeUntil} from 'rxjs/operators';
+import {filter, first, map, takeUntil} from 'rxjs/operators';
 
 export function waitWhilePending(form: AbstractControl, opts?: {stop?: Observable<any>, timeout?: number}): Promise<any> {
   const status$ = form.statusChanges
@@ -10,14 +10,18 @@ export function waitWhilePending(form: AbstractControl, opts?: {stop?: Observabl
     );
   const stop$ = opts?.stop || (opts?.timeout > 0 && timer(opts?.timeout));
   if (stop$) {
-    return firstValueFrom(
-      status$
+    return status$
         .pipe(
-          takeUntil(stop$)
-        ));
+          takeUntil(stop$),
+          first()
+        )
+    .toPromise();
   }
 
-  return firstValueFrom(status$);
+  return status$.pipe(
+      first()
+    )
+    .toPromise();
 }
 
 export function isPromise(value: any): value is Promise<any> {

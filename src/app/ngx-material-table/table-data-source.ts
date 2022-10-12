@@ -5,18 +5,17 @@ import {ValidatorService} from './validator.service';
 import {TableElement} from './table-element';
 import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
-import {FormGroup} from "@angular/forms";
+import {UntypedFormGroup} from "@angular/forms";
 
 /**
- * TableDataSourceOptions:
+ * TableDataSourceConfig:
  * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
  * suppressErrors: if true, no error log
  * restoreOriginalDataOnCancel: if true, canceling a row will restore the original data, otherwise, previous data is restored
- */
+ **/
 export interface TableDataSourceConfig {
   prependNewElements?: boolean;
   suppressErrors?: boolean;
-  allowCancel?: boolean;
   restoreOriginalDataOnCancel?: boolean;
 }
 
@@ -54,7 +53,7 @@ export class TableDataSource<T,
    * Creates a new TableDataSource instance, that can be used as datasource of `@angular/cdk` data-table.
    * @param data Array containing the initial values for the TableDataSource. If not specified, then `dataType` must be specified.
    * @param dataType Type of data contained by the Table. If not specified, then `data` with at least one element must be specified.
-   * @param validatorService Service that create instances of the FormGroup used to validate row fields.
+   * @param validatorService Service that create instances of the UntypedFormGroup used to validate row fields.
    * @param config Additional configuration for table.
    */
   constructor(
@@ -67,7 +66,6 @@ export class TableDataSource<T,
     this._config = {
       prependNewElements: false,
       suppressErrors: false,
-      allowCancel: true,
       restoreOriginalDataOnCancel: false,
       ...config
     };
@@ -105,6 +103,7 @@ export class TableDataSource<T,
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
    * @param insertAt: insert the new element at specified position
+   * @param options
    */
   async createNew(insertAt?: number, options = {editing: true}): Promise<TableElement<T>|undefined> {
     const rows = this.rowsSubject.getValue();
@@ -156,6 +155,7 @@ export class TableDataSource<T,
    * Confirm creation of the row. Save changes and disable editing.
    * If validation active and row data is invalid, it doesn't confirm creation neither disable editing.
    * @param row Row to be confirmed.
+   * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
   confirmCreate(row: TableElement<T>, options = {emitEvent: true}): boolean {
     const valid = row.isValid();
@@ -179,6 +179,7 @@ export class TableDataSource<T,
    * Confirm edition of the row. Save changes and disable editing.
    * If validation active and row data is invalid, it doesn't confirm editing neither disable editing.
    * @param row Row to be edited.
+   * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
   confirmEdit(row: TableElement<T>, options = {emitEvent: true}): boolean {
     const valid = row.isValid();
@@ -205,8 +206,10 @@ export class TableDataSource<T,
   }
 
   startEdit(row: TableElement<T>): boolean {
+    if (row.editing) return true; // Already editing
+
     // Save the original data, to be able to cancel changes
-    if (this._config.allowCancel && (!row.originalData || !this._config.restoreOriginalDataOnCancel)) {
+    if (!row.originalData || !this._config.restoreOriginalDataOnCancel) {
       row.originalData = row.cloneData();
     }
     row.editing = true;
@@ -238,10 +241,14 @@ export class TableDataSource<T,
   cancel(row: TableElement<T>): boolean {
     if (row.id === -1) throw new Error('Cannot cancel a newly created row. Please use delete() or cancelOrDelete() instead');
     if (!row.editing) throw new Error('Cannot cancel a not editing row. Please use delete() or cancelOrDelete() instead');
-    if (!this._config.allowCancel) throw new Error('Cannot cancel a row. Please enable using option \'allowCancel: true\'');
 
     row.currentData = row.originalData;
     row.editing = false;
+
+    // Mark row as pristine (if content was restored from original data)
+    if (row.validator && this._config.restoreOriginalDataOnCancel) {
+      row.validator.markAsPristine();
+    }
 
     return true;
   }
@@ -253,7 +260,7 @@ export class TableDataSource<T,
    */
   move(id: number, direction: number): boolean {
     if (direction === 0) {
-      return;
+      return false;
     }
 
     const source = this.rowsSubject.getValue();
@@ -271,7 +278,7 @@ export class TableDataSource<T,
   }
 
   async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
-    return this.confirmRows(this.rowsSubject.getValue())
+    return this.confirmRows(this.rowsSubject.getValue(), options)
   }
 
   async confirmRows(source: TableElement<T>[], options = {emitEvent: true}): Promise<boolean> {
@@ -281,9 +288,10 @@ export class TableDataSource<T,
     if (editingRows.length === 0) return true; // No row to confirm
 
     // Try to confirm each rows
-    const confirmResults = editingRows.map(row => this.confirmEditCreate(row, {
-        emitEvent: false // Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after
-      }));
+    const confirmResults = editingRows
+      .map(row => this.confirmEditCreate(row,
+        {emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after */}
+      ));
 
     // Update datasource, if some rows has been confirmed (=changed)
     const confirmedRowCount = confirmResults.filter(ok => ok).length
@@ -299,7 +307,7 @@ export class TableDataSource<T,
    * Get row from the table.
    * @param id Id of the row to retrieve, -1 returns the current new line.
    */
-  public getRow(id: number): TableElement<T> {
+  getRow(id: number): TableElement<T> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -398,10 +406,9 @@ export class TableDataSource<T,
   /**
    * Get the data from the rows.
    * @param rows Rows to extract the data.
-   * @param options
    */
   protected getDataFromRows(rows: TableElement<T>[]): T[] {
-    const mapToDataFn = this._config.allowCancel && !this._config.restoreOriginalDataOnCancel
+    const mapToDataFn = !this._config.restoreOriginalDataOnCancel
         ? (row => row.originalData || row.currentData)
         : (row => row.currentData) // Always return currentData, if orginalData is NOT update at each edition
     return rows
@@ -455,7 +462,7 @@ export class TableDataSource<T,
     }
   }
 
-  protected createRowValidator(options = {editing: false}): FormGroup {
+  protected createRowValidator(options = {editing: false}): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
     if (!options.editing) {
@@ -467,10 +474,11 @@ export class TableDataSource<T,
   /**
    * Create many validators (batch mode)
    * @param count
+   * @param options
    * @protected
    */
-  protected createRowValidators(count: number, options = {editing: false}): FormGroup[] {
-    const validators = new Array<FormGroup>(count);
+  protected createRowValidators(count: number, options = {editing: false}): UntypedFormGroup[] {
+    const validators = new Array<UntypedFormGroup>(count);
     for (let i = 0; i<count; i++) {
       validators[i] = this.createRowValidator(options);
     }

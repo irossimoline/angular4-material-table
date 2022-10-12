@@ -10,18 +10,22 @@
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
-    "module": "esnext",
+    "incremental": true,
+    "module": "es2020",
     "moduleResolution": "node",
     "typeRoots": [
         "node_modules/@types"
     ],
-    "target": "es2015",
+    "target": "es2020",
     "lib": [
-        "es2018",
+        "es2020",
         "dom"
     ]
   },
   "angularCompilerOptions": {
-
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   }
 }

@@ -5,13 +5,13 @@ import {TableDataSource} from '../ngx-material-table/table-data-source';
 import {environment} from '../../environments/environment';
 
 @Component({
-  selector: 'app-person-list',
+  selector: 'app-person-list-reactive-forms',
   providers: [
     {provide: ValidatorService, useClass: PersonValidatorService }
   ],
-  templateUrl: './person-list-reactive-forms.component.html',
+  templateUrl: './person-list-reactive-forms.component.html'
 })
-export class PersonListComponent implements OnInit {
+export class PersonListReactiveFormsComponent implements OnInit {
 
   constructor(private personValidator: ValidatorService) { }
 
@@ -23,7 +23,7 @@ export class PersonListComponent implements OnInit {
   dataSource: TableDataSource<Person>;
 
   ngOnInit() {
-    this.dataSource = new TableDataSource<any>(this.personList || [],
+    this.dataSource = new TableDataSource<Person>(this.personList || [],
       Person,
       this.personValidator,
       {

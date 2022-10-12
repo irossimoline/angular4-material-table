@@ -1,9 +1,9 @@
 import {TableElement} from './table-element';
-import {FormGroup} from '@angular/forms';
+import {UntypedFormGroup} from '@angular/forms';
 
 export class TableElementReactiveForms<T> extends TableElement<T> {
 
-  validator: FormGroup;
+  validator: UntypedFormGroup;
 
   get currentData(): T {
     return this.validator.getRawValue();
@@ -48,15 +48,37 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
   }
 
   isValid(): boolean {
-    if (this.validator.disabled) {
-      // Enable temporarily the validator to get the valid status
+
+    // Enable temporarily the validator to get the valid status
+    const disabled = this.validator.disabled;
+    if (disabled) {
       this.validator.enable({emitEvent: false, onlySelf: true});
       this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
-      const valid = this.validator.valid;
-      this.validator.disable({emitEvent: false, onlySelf: true});
-      return valid;
+      // TODO: update validity and status
     }
-    return this.validator.valid;
+
+    try {
+      if (!this.validator.valid) {
+
+        // FIXME: enable this code, when isValid() will be async
+        // Wait end of async validation
+        //if (this.validator.pending) {
+        //  await waitWhilePending(this.validator);
+        //}
+
+        // Quit if really invalid
+        if (this.validator.invalid) {
+          return false;
+        }
+      }
+
+      return true;
+    } finally {
+      // Re-disabled, if need
+      if (disabled) {
+        this.validator.disable({emitEvent: false, onlySelf: true});
+      }
+    }
   }
 
   cloneData(): T {

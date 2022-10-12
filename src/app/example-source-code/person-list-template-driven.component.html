@@ -2,32 +2,35 @@
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing" matInput>
+      <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <input matInput [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing">
       </mat-form-field>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="age">
     <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing" matInput>
+      <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <input matInput type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing">
       </mat-form-field>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="actionsColumn">
     <mat-header-cell *matHeaderCellDef>
-      <button mat-icon-button color="accent" (click)="dataSource.createNew()"><i class="fa fa-plus mat-icon"></i></button>
+      <button mat-icon-button color="accent" (click)="dataSource.createNew()">
+        <mat-icon>add_circle</mat-icon>
+      </button>
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <button *ngIf="!row.editing" mat-icon-button color="primary" focusable="false" (click)="row.startEdit()">
-        <i class="fa fa-pencil mat-icon"></i>
+      <button *ngIf="!row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.startEdit()">
+        <mat-icon>create</mat-icon>
       </button>
-      <button *ngIf="row.editing" mat-icon-button color="primary" focusable="false" (click)="row.confirmEditCreate()">
-        <i class="fa fa-check mat-icon"></i>
+      <button *ngIf="row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.confirmEditCreate()">
+        <mat-icon>done</mat-icon>
       </button>
-      <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
-        <i class="fa fa-times mat-icon"></i>
+      <button mat-icon-button color="primary" tabindex="-1" (click)="row.cancelOrDelete()">
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
       </button>
     </mat-cell>
   </ng-container>

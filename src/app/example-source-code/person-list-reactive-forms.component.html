@@ -3,7 +3,16 @@
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
-        <input [formControl]="row.validator.controls['name']" placeholder="Name" matInput>
+        <input [formControl]="row.validator.controls.name" placeholder="Name" matInput>
+        <mat-error *ngIf="row.validator.controls.name.hasError('required')">
+          Required
+        </mat-error>
+        <mat-error *ngIf="row.validator.controls.name.hasError('minLength')">
+          Should have more than 2 caracters
+        </mat-error>
+        <mat-hint *ngIf="row.valid">
+          <mat-icon>check</mat-icon> Available and valid
+        </mat-hint>
       </mat-form-field>
     </mat-cell>
   </ng-container>
@@ -11,7 +20,13 @@
     <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
-        <input [formControl]="row.validator.controls['age']" type="number" placeholder="Age" matInput>
+        <input [formControl]="row.validator.controls.age" type="number" placeholder="Age" matInput>
+        <mat-error *ngIf="row.validator.controls.age.hasError('min')">
+          Should be greater than 0
+        </mat-error>
+        <mat-error *ngIf="row.validator.controls.age.hasError('max')">
+          Should be less than 120
+        </mat-error>
       </mat-form-field>
     </mat-cell>
   </ng-container>
@@ -20,17 +35,22 @@
       <button mat-icon-button color="accent" (click)="dataSource.createNew()">
         <mat-icon>add_circle</mat-icon>
       </button>
+      <button mat-button color="accent" (click)="dataSource.confirmAllRows()">
+        <mat-icon>done</mat-icon> Validate all
+      </button>
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <button *ngIf="!row.editing" mat-icon-button color="primary" focusable="false" (click)="row.startEdit()">
+      <button *ngIf="!row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.startEdit()">
         <mat-icon>create</mat-icon>
       </button>
-      <button *ngIf="row.editing" mat-icon-button color="primary" focusable="false" (click)="row.confirmEditCreate()">
+      <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
         <mat-icon>done</mat-icon>
       </button>
-      <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
-        <mat-icon>delete</mat-icon>
+      <button mat-icon-button color="primary" tabindex="-1" (click)="row.cancelOrDelete()">
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
       </button>
+      <mat-spinner *ngIf="row.pending" diameter="24"></mat-spinner>
     </mat-cell>
   </ng-container>
 

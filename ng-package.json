@@ -3,7 +3,7 @@
     "lib": {
         "entryFile": "public_api.ts"
     },
-    "whitelistedNonPeerDependencies": [
-        "lodash.clonedeep"
+    "allowedNonPeerDependencies": [
+      "clone"
     ]
 }

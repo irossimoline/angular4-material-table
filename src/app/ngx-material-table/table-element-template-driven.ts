@@ -1,5 +1,6 @@
 import {TableElement} from './table-element';
-import cloneDeep from 'lodash.clonedeep';
+import * as clone from 'clone';
+
 
 export class TableElementTemplateDriven<T> extends TableElement<T> {
 
@@ -55,6 +56,6 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
   }
 
   cloneData(): T {
-    return cloneDeep(this.currentData);
+    return clone(this._currentData);
   }
 }

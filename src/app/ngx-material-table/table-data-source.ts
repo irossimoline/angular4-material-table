@@ -6,7 +6,6 @@ import {TableElement} from './table-element';
 import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {UntypedFormGroup} from '@angular/forms';
-import {isPromise} from './validator.utils';
 
 /**
  * TableDataSourceConfig:
@@ -160,8 +159,7 @@ export class TableDataSource<T,
    */
   confirmCreate(row: R, options = {emitEvent: true}): boolean {
     const valid = row.isValid();
-    if (!this._config.suppressErrors && isPromise(valid)) console.error('Invalid isValid() result. Expected a boolean, but get a Promise. Use AsyncTableDataSource to use Promise');
-    if (valid !== true) {
+    if (!valid) {
       return false;
     }
 
@@ -185,8 +183,7 @@ export class TableDataSource<T,
    */
   confirmEdit(row: R, options = {emitEvent: true}): boolean {
     const valid = row.isValid();
-    if (!this._config.suppressErrors && isPromise(valid)) console.error('Invalid isValid() result. Expected a boolean, but get a Promise. Use AsyncTableDataSource to use Promise');
-    if (valid !== true) {
+    if (!valid) {
       return false;
     }
 
@@ -444,7 +441,7 @@ export class TableDataSource<T,
         currentData: data,
         source: this,
         validator: validators[index]
-      }, true /* async */);
+      });
     });
   }
 

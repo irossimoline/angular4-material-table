@@ -4,15 +4,10 @@ import {AsyncTableElementReactiveForms} from './async/async-table-element-reacti
 
 export class TableElementFactory {
 
-  public static createTableElement(newElement: any, async?: boolean): any {
+  public static createTableElement(newElement: any): any {
     if (this.isValidatorDefined(newElement)) {
-      if (async !== true) {
-        // Create reactive forms element here.
-        return new TableElementReactiveForms(newElement);
-      }
-      else {
-        return new AsyncTableElementReactiveForms(newElement);
-      }
+      // Create reactive forms element here.
+      return new TableElementReactiveForms(newElement);
     } else {
       // Default is the one without validator.
       return new TableElementTemplateDriven(newElement);

@@ -54,7 +54,6 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
     if (disabled) {
       this.validator.enable({emitEvent: false, onlySelf: true});
       this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
-      // TODO: update validity and status
     }
 
     try {

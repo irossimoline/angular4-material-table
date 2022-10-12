@@ -41,7 +41,7 @@ Using this extension, you can set CDK data-table `datasource` with an instance o
 
 Using `TableDataSource` allows you to have some row related methods and data to implement add/edit/remove elements:
 ```typescript
-class TableElement<T> {
+class AsyncTableElement<T> {
   id: number;
   editing: boolean;
   currentData?: T;
@@ -72,7 +72,7 @@ class TableDataSource<T> {
 
   createNew(): void;
 
-  getRow(id: number): TableElement<T>;
+  getRow(id: number): AsyncTableElement<T>;
 }
 ```
 

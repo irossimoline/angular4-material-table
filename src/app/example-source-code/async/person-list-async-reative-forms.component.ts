@@ -6,7 +6,7 @@ import {environment} from '../../../environments/environment';
 import {Person} from '../person.model';
 import {AsyncPersonValidatorService} from './person-list-async.validator';
 import {PersonListReactiveFormsComponent} from '../person-list-reative-forms.component';
-import {AsyncTableDataSource} from '../../ngx-material-table/async-table-data-source';
+import {AsyncTableDataSource} from '../../ngx-material-table/async/async-table-data-source';
 
 @Component({
   selector: 'app-person-list-async-reactive-forms',

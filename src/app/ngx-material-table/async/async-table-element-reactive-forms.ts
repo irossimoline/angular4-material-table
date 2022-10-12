@@ -1,8 +1,8 @@
-import {TableElement} from './table-element';
 import {UntypedFormGroup} from '@angular/forms';
-import {waitWhilePending} from './validator.utils';
+import {waitWhilePending} from '../validator.utils';
+import {AsyncTableElement} from './async-table-element';
 
-export class AsyncTableElementReactiveForms<T> extends TableElement<T, Promise<boolean>> {
+export class AsyncTableElementReactiveForms<T> extends AsyncTableElement<T> {
 
   validator: UntypedFormGroup;
 
@@ -54,7 +54,7 @@ export class AsyncTableElementReactiveForms<T> extends TableElement<T, Promise<b
     const disabled = this.validator.disabled;
     if (disabled) {
       this.validator.enable({emitEvent: false, onlySelf: true});
-      //this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
+      this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
     }
 
     try {

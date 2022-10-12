@@ -1,17 +1,17 @@
 import {CollectionViewer, DataSource, ListRange} from '@angular/cdk/collections';
 import {BehaviorSubject, Observable, Subject, Subscription} from 'rxjs';
-import {TableElementFactory} from './table-element.factory';
-import {ValidatorService} from './validator.service';
-import {TableElement} from './table-element';
+import {AsyncTableElementFactory} from './async-table-element.factory';
+import {ValidatorService} from '../validator.service';
 import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {UntypedFormGroup} from '@angular/forms';
-import {TableDataSourceConfig} from './table-data-source';
+import {TableDataSourceConfig} from '../table-data-source';
+import {AsyncTableElement} from './async-table-element';
 
 export class AsyncTableDataSource<T,
   V extends ValidatorService = ValidatorService,
   C extends TableDataSourceConfig = TableDataSourceConfig,
-  R extends TableElement<T, Promise<boolean>|boolean> = TableElement<T, Promise<boolean>|boolean>
+  R extends AsyncTableElement<T> = AsyncTableElement<T>
   > extends DataSource<R> {
 
   /**
@@ -102,13 +102,13 @@ export class AsyncTableDataSource<T,
     const [currentData, validator] = [this.createNewObject(), this.createRowValidator(options)];
 
     const id = options.editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
-    const newElement = TableElementFactory.createTableElement({
+    const newElement = AsyncTableElementFactory.createTableElement({
       id,
       editing: options.editing,
       source: this,
       currentData,
       validator
-    }, true /*async*/);
+    });
 
     if (insertAt) {
       rows.splice(insertAt, 0, newElement);
@@ -334,7 +334,7 @@ export class AsyncTableDataSource<T,
   }
 
   /**
-   * Get not saved rows
+   * Get editing rows
    */
   protected getEditingRows(source: R[]): R[] {
     return source.filter(row => row.editing);
@@ -424,13 +424,13 @@ export class AsyncTableDataSource<T,
     const validators = this.createRowValidators(arrayData.length, {editing: false});
 
     return arrayData.map<R>((data, index) => {
-      return TableElementFactory.createTableElement({
+      return AsyncTableElementFactory.createTableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
         editing: false,
         currentData: data,
         source: this,
         validator: validators[index]
-      }, true /*async*/);
+      });
     });
   }
 

@@ -43,10 +43,13 @@
       <button *ngIf="!row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.startEdit()">
         <mat-icon>edit</mat-icon>
       </button>
-      <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
+      <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()"
+              [disabled]="row.pending">
         <mat-icon>done</mat-icon>
       </button>
-      <button mat-icon-button color="primary" tabindex="-1" (click)="row.cancelOrDelete()">
+      <button mat-icon-button color="primary" tabindex="-1"
+              (click)="row.cancelOrDelete()"
+              [disabled]="row.pending">
         <mat-icon *ngIf="row.editing">undo</mat-icon>
         <mat-icon *ngIf="!row.editing">delete</mat-icon>
       </button>

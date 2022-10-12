@@ -4,6 +4,12 @@
                                 (personListChange)="personListChanged($event)"
 ></app-person-list-reactive-forms>
 
+<h1>Reactive form example (async validator):</h1>
+
+<app-person-list-async-reactive-forms [personList]="personList" #reactiveFormsListAsync
+                                      (personListChange)="personListChanged($event)"
+></app-person-list-async-reactive-forms>
+
 
 <h1>Template driven example:</h1>
 

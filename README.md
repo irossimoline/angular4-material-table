@@ -118,13 +118,14 @@ Optional libraries used in the example:
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <button *ngIf="!row.editing" mat-icon-button color="primary" (click)="row.startEdit()">
-            <i class="fa fa-pencil mat-icon"></i>
+        <mat-icon>edit</mat-icon>
       </button>
       <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
-            <i class="fa fa-check mat-icon"></i>
+        <mat-icon>done</mat-icon>
       </button>
       <button mat-icon-button color="primary" (click)="row.cancelOrDelete()">
-         <i class="fa fa-times mat-icon"></i>
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
       </button>
     </mat-cell>
   </ng-container>
@@ -161,13 +162,14 @@ Optional libraries used in the example:
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <button *ngIf="!row.editing" mat-icon-button color="primary" (click)="row.startEdit()">
-            <i class="fa fa-pencil mat-icon"></i>
+        <mat-icon>edit</mat-icon>
       </button>
       <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
-            <i class="fa fa-check mat-icon"></i>
+        <mat-icon>done</mat-icon>
       </button>
       <button mat-icon-button color="primary" (click)="row.cancelOrDelete()">
-            <i class="fa fa-times mat-icon"></i>
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
       </button>
     </mat-cell>
   </ng-container>

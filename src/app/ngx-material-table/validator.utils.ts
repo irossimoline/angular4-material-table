@@ -19,3 +19,7 @@ export function waitWhilePending(form: AbstractControl, opts?: {stop?: Observabl
 
   return firstValueFrom(status$);
 }
+
+export function isPromise(value: any): value is Promise<any> {
+  return (typeof value === 'object' && (value instanceof Promise || !!value['then']));
+}

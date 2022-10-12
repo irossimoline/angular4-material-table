@@ -2,11 +2,13 @@ import {UntypedFormGroup} from '@angular/forms';
 
 import {TableDataSource} from './table-data-source';
 
-export abstract class TableElement<T> {
+export abstract class TableElement<T,
+  VALID extends Promise<boolean>|boolean = boolean
+  > {
 
   id: number;
   originalData?: T;
-  source: TableDataSource<T>;
+  source: TableDataSource<T, any, any, TableElement<any, any>>;
 
   abstract get editing(): boolean;
   abstract set editing(editing: boolean);
@@ -52,5 +54,5 @@ export abstract class TableElement<T> {
   /**
    * Check if the row is valid. Use Promise to allow async validator to finish
    */
-  abstract isValid(): boolean;
+  abstract isValid(): VALID;
 }

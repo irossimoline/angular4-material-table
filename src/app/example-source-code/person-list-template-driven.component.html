@@ -20,10 +20,13 @@
       <button mat-icon-button color="accent" (click)="dataSource.createNew()">
         <mat-icon>add_circle</mat-icon>
       </button>
+      <button mat-button color="accent" (click)="dataSource.confirmAllRows()">
+        <mat-icon>done_all</mat-icon> Validate all
+      </button>
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
       <button *ngIf="!row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.startEdit()">
-        <mat-icon>create</mat-icon>
+        <mat-icon>edit</mat-icon>
       </button>
       <button *ngIf="row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.confirmEditCreate()">
         <mat-icon>done</mat-icon>

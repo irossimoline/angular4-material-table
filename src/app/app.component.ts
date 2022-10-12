@@ -1,8 +1,9 @@
 /* tslint:disable:max-line-length */
 import {Component, ViewChild} from '@angular/core';
-import {Person} from './example-source-code/person-list.validator';
 import {PersonListTemplateDrivenComponent} from './example-source-code/person-list-template-driven.component';
 import {PersonListReactiveFormsComponent} from './example-source-code/person-list-reative-forms.component';
+import {Person} from './example-source-code/person.model';
+import {PersonListAsyncReactiveFormsComponent} from './example-source-code/async/person-list-async-reative-forms.component';
 
 @Component({
     selector: 'app-root',
@@ -12,6 +13,7 @@ import {PersonListReactiveFormsComponent} from './example-source-code/person-lis
 export class AppComponent {
 
   @ViewChild('reactiveFormsList') reactiveFormsList: PersonListReactiveFormsComponent;
+  @ViewChild('reactiveFormsListAsync') reactiveFormsListAsync: PersonListAsyncReactiveFormsComponent;
   @ViewChild('templateDrivenList') templateDrivenList: PersonListTemplateDrivenComponent;
 
   personList: Person[] = [
@@ -23,6 +25,7 @@ export class AppComponent {
   personListChanged(personList: Person[]) {
     console.info('New person list:', personList);
     this.reactiveFormsList.dataSource.updateDatasource(personList);
+    this.reactiveFormsListAsync.dataSource.updateDatasource(personList);
     this.templateDrivenList.dataSource.updateDatasource(personList);
   }
 }

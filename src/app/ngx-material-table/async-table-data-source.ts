@@ -6,24 +6,12 @@ import {TableElement} from './table-element';
 import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {UntypedFormGroup} from '@angular/forms';
-import {isPromise} from './validator.utils';
+import {TableDataSourceConfig} from './table-data-source';
 
-/**
- * TableDataSourceConfig:
- * prependNewElements: if true, the new row is prepended to all other rows; otherwise it is appended
- * suppressErrors: if true, no error log
- * restoreOriginalDataOnCancel: if true, canceling a row will restore the original data, otherwise, previous data is restored
- **/
-export interface TableDataSourceConfig {
-  prependNewElements?: boolean;
-  suppressErrors?: boolean;
-  restoreOriginalDataOnCancel?: boolean;
-}
-
-export class TableDataSource<T,
+export class AsyncTableDataSource<T,
   V extends ValidatorService = ValidatorService,
   C extends TableDataSourceConfig = TableDataSourceConfig,
-  R extends TableElement<T> = TableElement<T>
+  R extends TableElement<T, Promise<boolean>|boolean> = TableElement<T, Promise<boolean>|boolean>
   > extends DataSource<R> {
 
   /**
@@ -120,7 +108,7 @@ export class TableDataSource<T,
       source: this,
       currentData,
       validator
-    });
+    }, true /*async*/);
 
     if (insertAt) {
       rows.splice(insertAt, 0, newElement);
@@ -136,7 +124,7 @@ export class TableDataSource<T,
     return newElement;
   }
 
-  confirmEditCreate(row: R, options = {emitEvent: true}): boolean {
+  confirmEditCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
     if (row.id === -1) {
       return this.confirmCreate(row, options);
     } else {
@@ -144,7 +132,7 @@ export class TableDataSource<T,
     }
   }
 
-  cancelOrDelete(row: R, options = {emitEvent: true}): boolean {
+  cancelOrDelete(row: R, options = {emitEvent: true}): Promise<boolean> {
     if (row.id === -1 || !row.editing) {
       return this.delete(row.id, options);
     } else {
@@ -158,9 +146,8 @@ export class TableDataSource<T,
    * @param row Row to be confirmed.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  confirmCreate(row: R, options = {emitEvent: true}): boolean {
-    const valid = row.isValid();
-    if (!this._config.suppressErrors && isPromise(valid)) console.error('Invalid isValid() result. Expected a boolean, but get a Promise. Use AsyncTableDataSource to use Promise');
+  async confirmCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
+    const valid = await row.isValid();
     if (valid !== true) {
       return false;
     }
@@ -183,9 +170,8 @@ export class TableDataSource<T,
    * @param row Row to be edited.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  confirmEdit(row: R, options = {emitEvent: true}): boolean {
-    const valid = row.isValid();
-    if (!this._config.suppressErrors && isPromise(valid)) console.error('Invalid isValid() result. Expected a boolean, but get a Promise. Use AsyncTableDataSource to use Promise');
+  async confirmEdit(row: R, options = {emitEvent: true}): Promise<boolean> {
+    const valid = await row.isValid();
     if (valid !== true) {
       return false;
     }
@@ -208,7 +194,7 @@ export class TableDataSource<T,
     return true;
   }
 
-  startEdit(row: R): boolean {
+  async startEdit(row: R): Promise<boolean> {
     if (row.editing) return true; // Already editing
 
     // Save the original data, to be able to cancel changes
@@ -222,7 +208,7 @@ export class TableDataSource<T,
   /**
    * Delete the row with the index specified.
    */
-  delete(id: number, options = {emitEvent: true}): boolean {
+  delete(id: number, options = {emitEvent: true}): Promise<boolean> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -234,26 +220,26 @@ export class TableDataSource<T,
     if (id !== -1 && options.emitEvent) {
       this.updateDatasourceFromRows(source);
     }
-    return true;
+    return Promise.resolve(true);
   }
 
   /**
    * Restore the original data
    * @param row
    */
-  cancel(row: R): boolean {
+  cancel(row: R): Promise<boolean> {
     if (row.id === -1) throw new Error('Cannot cancel a newly created row. Please use delete() or cancelOrDelete() instead');
     if (!row.editing) throw new Error('Cannot cancel a not editing row. Please use delete() or cancelOrDelete() instead');
 
     row.currentData = row.originalData;
     row.editing = false;
 
-    // Mark row as pristine (if content was restored from original data)
+    // Mark row as pristine (if content restore from original data)
     if (row.validator && this._config.restoreOriginalDataOnCancel) {
       row.validator.markAsPristine();
     }
 
-    return true;
+    return Promise.resolve(true);
   }
 
   /**
@@ -261,9 +247,9 @@ export class TableDataSource<T,
    * @param id Id of the row
    * @param direction Direction: negative value for up, positive value for down
    */
-  move(id: number, direction: number): boolean {
+  move(id: number, direction: number): Promise<boolean> {
     if (direction === 0) {
-      return false;
+      return Promise.resolve(false);
     }
 
     const source = this.rowsSubject.getValue();
@@ -277,7 +263,7 @@ export class TableDataSource<T,
     if (id !== -1) {
       this.updateDatasourceFromRows(source);
     }
-    return true;
+    return Promise.resolve(true);
   }
 
   async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
@@ -291,10 +277,10 @@ export class TableDataSource<T,
     if (editingRows.length === 0) return true; // No row to confirm
 
     // Try to confirm each rows
-    const confirmResults = editingRows
-      .map(row => this.confirmEditCreate(row,
-        {emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after */}
-      ));
+    const confirmResults = await Promise.all(
+      editingRows
+        .map(row => this.confirmEditCreate(row, {emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after*/}))
+    );
 
     // Update datasource, if some rows has been confirmed (=changed)
     const confirmedRowCount = confirmResults.filter(ok => ok).length
@@ -326,7 +312,7 @@ export class TableDataSource<T,
    * from 'datasourceSubject' with the updated data. If false, it doesn't
    * emit an event. True by default.
    */
-  updateDatasource(data: T[], options = {emitEvent: true}): void {
+  updateDatasource(data: T[], options = {emitEvent: true}) {
     if (this.currentData !== data) {
       this.currentData = data;
 
@@ -412,8 +398,8 @@ export class TableDataSource<T,
    */
   protected getDataFromRows(rows: R[]): T[] {
     const mapToDataFn = !this._config.restoreOriginalDataOnCancel
-        ? (row => row.originalData || row.currentData)
-        : (row => row.currentData) // Always return currentData, if orginalData is NOT update at each edition
+      ? (row => row.originalData || row.currentData)
+      : (row => row.currentData) // Always return currentData, if orginalData is NOT update at each edition
     return rows
       .filter(row => row.id !== -1)
       .map<T>(mapToDataFn);
@@ -444,7 +430,7 @@ export class TableDataSource<T,
         currentData: data,
         source: this,
         validator: validators[index]
-      }, true /* async */);
+      }, true /*async*/);
     });
   }
 

@@ -101,13 +101,15 @@ export class AsyncTableDataSource<T,
 
     const [currentData, validator] = [this.createNewObject(), this.createRowValidator(options)];
 
-    const id = options.editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
+    const editing = (options.editing !== false); // true by default
+    const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = AsyncTableElementFactory.createTableElement({
       id,
-      editing: options.editing,
-      source: this,
+      editing,
       currentData,
-      validator
+      validator,
+      // Link to datasource
+      source: this
     });
 
     if (insertAt) {
@@ -208,7 +210,7 @@ export class AsyncTableDataSource<T,
   /**
    * Delete the row with the index specified.
    */
-  delete(id: number, options = {emitEvent: true}): Promise<boolean> {
+  async delete(id: number, options = {emitEvent: true}): Promise<boolean> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -220,7 +222,7 @@ export class AsyncTableDataSource<T,
     if (id !== -1 && options.emitEvent) {
       this.updateDatasourceFromRows(source);
     }
-    return Promise.resolve(true);
+    return true;
   }
 
   /**
@@ -234,7 +236,7 @@ export class AsyncTableDataSource<T,
     row.currentData = row.originalData;
     row.editing = false;
 
-    // Mark row as pristine (if content restore from original data)
+    // Mark row as pristine (if content was restored from original data)
     if (row.validator && this._config.restoreOriginalDataOnCancel) {
       row.validator.markAsPristine();
     }
@@ -247,9 +249,9 @@ export class AsyncTableDataSource<T,
    * @param id Id of the row
    * @param direction Direction: negative value for up, positive value for down
    */
-  move(id: number, direction: number): Promise<boolean> {
+  async move(id: number, direction: number): Promise<boolean> {
     if (direction === 0) {
-      return Promise.resolve(false);
+      return false;
     }
 
     const source = this.rowsSubject.getValue();
@@ -263,7 +265,7 @@ export class AsyncTableDataSource<T,
     if (id !== -1) {
       this.updateDatasourceFromRows(source);
     }
-    return Promise.resolve(true);
+    return true;
   }
 
   async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
@@ -312,7 +314,7 @@ export class AsyncTableDataSource<T,
    * from 'datasourceSubject' with the updated data. If false, it doesn't
    * emit an event. True by default.
    */
-  updateDatasource(data: T[], options = {emitEvent: true}) {
+  updateDatasource(data: T[], options = {emitEvent: true}): void {
     if (this.currentData !== data) {
       this.currentData = data;
 
@@ -451,10 +453,10 @@ export class AsyncTableDataSource<T,
     }
   }
 
-  protected createRowValidator(options = {editing: false}): UntypedFormGroup {
+  protected createRowValidator(options = {editing: true}): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
-    if (!options.editing) {
+    if (options.editing === false) {
       validator.disable({emitEvent: false});
     }
     return validator;

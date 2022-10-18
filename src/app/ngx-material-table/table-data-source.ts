@@ -112,13 +112,15 @@ export class TableDataSource<T,
 
     const [currentData, validator] = [this.createNewObject(), this.createRowValidator(options)];
 
-    const id = options.editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
+    const editing = (options.editing !== false); // true by default
+    const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = TableElementFactory.createTableElement({
       id,
-      editing: options.editing,
-      source: this,
+      editing,
       currentData,
-      validator
+      validator,
+      // Link to datasource
+      source: this
     });
 
     if (insertAt) {
@@ -345,7 +347,7 @@ export class TableDataSource<T,
   }
 
   /**
-   * Get not saved rows
+   * Get editing rows
    */
   protected getEditingRows(source: R[]): R[] {
     return source.filter(row => row.editing);
@@ -462,10 +464,10 @@ export class TableDataSource<T,
     }
   }
 
-  protected createRowValidator(options = {editing: false}): UntypedFormGroup {
+  protected createRowValidator(options = {editing: true}): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
-    if (!options.editing) {
+    if (options.editing === false) {
       validator.disable({emitEvent: false});
     }
     return validator;

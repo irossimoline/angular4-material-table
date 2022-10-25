@@ -229,5 +229,8 @@ class PersonValidatorService implements ValidatorService {
 Any suggestion or contribution will be appreciated.
 
 
+## Change log
+
+See [Change log](./doc/changelog.md)
 
 

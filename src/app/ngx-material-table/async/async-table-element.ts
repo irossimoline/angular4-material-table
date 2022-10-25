@@ -40,6 +40,10 @@ export abstract class AsyncTableElement<T> {
     return this.source.startEdit(this);
   }
 
+  move(direction: number): Promise<boolean>  {
+    return this.source.move(this.id, direction);
+  }
+
   abstract get valid(): boolean;
 
   abstract get pending(): boolean;

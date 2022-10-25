@@ -1,4 +1,4 @@
-import {ValidatorService} from '../../ngx-material-table/validator.service';
+import {ValidatorService} from '../ngx-material-table/validator.service';
 import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {Injectable} from '@angular/core';
 import {timer} from 'rxjs';

@@ -1,0 +1,13 @@
+.mat-table {
+  width: 100%;
+
+  .mat-row {
+    min-height: 58px;
+    max-height: 58px;
+  }
+}
+
+.cdk-virtual-scroll-viewport {
+  width: calc(100% - 2 * var(--margin, 0px));
+  min-height: calc(100vh - 131px - 2 * var(--margin, 0px));
+}

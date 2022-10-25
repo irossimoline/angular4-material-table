@@ -19,6 +19,11 @@ app-root {
   flex-direction: column;
 }
 
+.wrapper {
+  --margin: 16px;
+  margin: var(--margin, 0px);
+}
+
 @import '@angular/material/theming';
 @include mat-core();
 // Define the palettes for your theme using the Material Design palettes available in palette.scss

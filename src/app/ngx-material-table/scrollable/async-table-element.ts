@@ -1,12 +1,11 @@
 import {UntypedFormGroup} from '@angular/forms';
+import {ScrollableTableDataSource} from './scrollable-table-data-source';
 
-import {TableDataSource} from './table-data-source';
-
-export abstract class TableElement<T> {
+export abstract class AsyncTableElement<T> {
 
   id: number;
   originalData?: T;
-  source: TableDataSource<T, any, any, TableElement<any>>;
+  source: ScrollableTableDataSource<T, any>;
 
   abstract get editing(): boolean;
   abstract set editing(editing: boolean);
@@ -18,30 +17,30 @@ export abstract class TableElement<T> {
   abstract get validator(): UntypedFormGroup;
   abstract set validator(validator: UntypedFormGroup);
 
-  delete(): boolean {
+  delete(): Promise<boolean> {
     return this.source.delete(this.id);
   }
 
-  confirmEditCreate(): boolean {
+  confirmEditCreate(): Promise<boolean> {
     return this.source.confirmEditCreate(this);
   }
 
   /**
    * Cancel or delete
    */
-  cancelOrDelete(): boolean {
+  cancelOrDelete(): Promise<boolean> {
     return this.source.cancelOrDelete(this);
   }
 
-  cancel(): boolean {
+  cancel(): Promise<boolean> {
     return this.source.cancel(this);
   }
 
-  startEdit(): boolean {
+  startEdit(): Promise<boolean> {
     return this.source.startEdit(this);
   }
 
-  move(direction: number): boolean {
+  move(direction: number): Promise<boolean>  {
     return this.source.move(this.id, direction);
   }
 
@@ -54,7 +53,7 @@ export abstract class TableElement<T> {
   abstract get dirty(): boolean;
 
   /**
-   * Check if the row is valid.
+   * Check if the row is valid. Use Promise to allow async validator to finish
    */
-  abstract isValid(): boolean;
+  abstract isValid(): Promise<boolean>;
 }

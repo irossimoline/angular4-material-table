@@ -1,18 +1,8 @@
-<h1>Reactive form example:</h1>
+<nav mat-tab-nav-bar>
+  <a mat-tab-link routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">Basic</a>
+  <a mat-tab-link routerLink="/async" routerLinkActive="active" ariaCurrentWhenActive="page">Async validator</a>
+  <a mat-tab-link routerLink="/scrollable" routerLinkActive="active" ariaCurrentWhenActive="page">Virtual scroll view</a>
+</nav>
 
-<app-person-list-reactive-forms [personList]="personList" #reactiveFormsList
-                                (personListChange)="personListChanged($event)"
-></app-person-list-reactive-forms>
-
-<h1>Reactive form example (async validator):</h1>
-
-<app-person-list-async-reactive-forms [personList]="personList" #reactiveFormsListAsync
-                                      (personListChange)="personListChanged($event)"
-></app-person-list-async-reactive-forms>
-
-
-<h1>Template driven example:</h1>
-
-<app-person-list-template-driven [personList]="personList" #templateDrivenList
-                                 (personListChange)="personListChanged($event)"
-></app-person-list-template-driven>
+<!-- The routed views render in the <router-outlet>-->
+<router-outlet></router-outlet>

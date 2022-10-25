@@ -3,7 +3,7 @@ import {Component, ViewChild} from '@angular/core';
 import {PersonListTemplateDrivenComponent} from './example-source-code/person-list-template-driven.component';
 import {PersonListReactiveFormsComponent} from './example-source-code/person-list-reative-forms.component';
 import {Person} from './example-source-code/person.model';
-import {PersonListAsyncReactiveFormsComponent} from './example-source-code/async/person-list-async-reative-forms.component';
+import {PersonListAsyncReactiveFormsComponent} from './example-source-code/person-list-async-reative-forms.component';
 
 @Component({
     selector: 'app-root',

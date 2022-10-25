@@ -1,18 +1,18 @@
-import {CollectionViewer, DataSource, ListRange} from '@angular/cdk/collections';
-import {BehaviorSubject, Observable, Subject, Subscription} from 'rxjs';
+import {CollectionViewer, ListRange} from '@angular/cdk/collections';
+import {BehaviorSubject, Subject, Subscription} from 'rxjs';
 import {AsyncTableElementFactory} from './async-table-element.factory';
 import {ValidatorService} from '../validator.service';
-import {filter, map} from 'rxjs/operators';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 import {UntypedFormGroup} from '@angular/forms';
 import {TableDataSourceConfig} from '../table-data-source';
 import {AsyncTableElement} from './async-table-element';
+import {TableVirtualScrollDataSource} from 'ng-table-virtual-scroll';
 
-export class AsyncTableDataSource<T,
+export class ScrollableTableDataSource<T,
   V extends ValidatorService = ValidatorService,
   C extends TableDataSourceConfig = TableDataSourceConfig,
   R extends AsyncTableElement<T> = AsyncTableElement<T>
-  > extends DataSource<R> {
+  > extends TableVirtualScrollDataSource<R> {
 
   /**
    * Return the data array, of confirmed rows (currentData)
@@ -59,7 +59,7 @@ export class AsyncTableDataSource<T,
     dataType?: new () => T,
     protected validatorService?: V,
     config?: C) {
-    super();
+    super([]);
 
     this._config = {
       prependNewElements: false,
@@ -83,6 +83,10 @@ export class AsyncTableDataSource<T,
     this.datasourceSubject = new Subject<T[]>();
     const rows = this.createRowsFromData(data);
     this.rowsSubject = new BehaviorSubject(rows);
+    this.rowsSubject.subscribe(rows => {
+      this.data = rows;
+      this._updateChangeSubscription();
+    });
   }
 
   protected checkValidatorFields() {
@@ -178,8 +182,7 @@ export class AsyncTableDataSource<T,
     // Insert into rows array
     if (insertAt) {
       rows.splice(insertAt, 0, ...newElements);
-      const refreshStartIndex = this._config.prependNewElements ? insertAt + newElements.length - 1 : insertAt;
-      this.updateRowIds(refreshStartIndex, rows);
+      this.updateRowIds(0, rows);
     } else {
       if (this._config.prependNewElements) {
         rows = newElements.concat(...rows);
@@ -332,17 +335,15 @@ export class AsyncTableDataSource<T,
    * @param direction Direction: negative value for up, positive value for down
    */
   async move(id: number, direction: number): Promise<boolean> {
-    if (!direction) return false;
+    if (direction === 0) {
+      return false;
+    }
 
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
     moveItemInArray(source, index, index + direction);
-
-    const refreshStartIndex = this._config.prependNewElements
-      ? Math.max(index, index + direction)
-      : Math.min(index, index + direction);
-    this.updateRowIds(refreshStartIndex, source);
+    this.updateRowIds(0, source);
 
     this.rowsSubject.next(source);
 
@@ -473,9 +474,6 @@ export class AsyncTableDataSource<T,
 
     for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
       if (source[index].id !== -1) {
-        // DEBUG
-        //const newId = this.getRowIdFromIndex(index, source.length);
-        //console.debug(`Updating row id ${source[index].id} -> ${newId}`);
         source[index].id = this.getRowIdFromIndex(index, source.length);
       }
     }
@@ -571,7 +569,7 @@ export class AsyncTableDataSource<T,
 
   /** Connect function called by the table to retrieve one stream containing
    *  the data to render. */
-  connect(collectionViewer: CollectionViewer): Observable<R[] | ReadonlyArray<R>> {
+  /*connect(collectionViewer: CollectionViewer): BehaviorSubject<R[]> {
     // No collection viewer: return all data
     if (!collectionViewer) {
       return this.rowsSubject.asObservable();
@@ -599,9 +597,6 @@ export class AsyncTableDataSource<T,
             }
             return data.slice(range.start);
           }
-          if (range.end < data.length) {
-            return data.slice(0, range.end);
-          }
           return data;
         })
       );
@@ -609,7 +604,7 @@ export class AsyncTableDataSource<T,
 
   }
 
-  disconnect(collectionViewer: CollectionViewer) {
+  disconnect(collectionViewer: CollectionViewer): void {
     if (collectionViewer) {
       const refIndex = this.connectedViewers.findIndex(r => r.viewer === collectionViewer);
       if (refIndex !== -1) {
@@ -623,5 +618,5 @@ export class AsyncTableDataSource<T,
       this.rowsSubject.complete();
       this.datasourceSubject.complete();
     }
-  }
+  }*/
 }

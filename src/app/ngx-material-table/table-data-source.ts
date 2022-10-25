@@ -44,9 +44,18 @@ export class TableDataSource<T,
   }[] = [];
   protected currentData: any;
   private readonly _config: C;
+  private _newElement: R = null;
 
   get config(): C {
     return this._config;
+  }
+
+  /**
+   * Say if there is a new (and not confirmed) row
+   * @param source
+   */
+  get hasNewElement(): boolean {
+    return !!this._newElement;
   }
 
   /**
@@ -88,7 +97,7 @@ export class TableDataSource<T,
   }
 
   protected checkValidatorFields() {
-    if (!this._config.suppressErrors) return; // Skip, as error will not be logged
+    if (this._config.suppressErrors) return; // Skip, as error will not be logged
 
     const formGroup = this.createRowValidator();
     if (formGroup != null) {
@@ -105,14 +114,19 @@ export class TableDataSource<T,
    * @param insertAt: insert the new element at specified position
    * @param options
    */
-  async createNew(insertAt?: number, options = {editing: true}): Promise<R|undefined> {
+  async createNew(insertAt?: number, options?: {editing?: boolean, originalData?: T, emitEvent?: boolean;}): Promise<R|undefined> {
+    if (this.hasNewElement) {
+      if (!this._config.suppressErrors) {
+        console.warn('Cannot add new row, because already has nex row. Please confirm it first');
+      }
+      return; // Cannot add if still have some new element
+    }
+
     const rows = this.rowsSubject.getValue();
 
-    if (this.existsNewElement(rows)) return;
+    const [currentData, validator] = [options?.originalData || this.createNewObject(), this.createRowValidator({editing: options?.editing})];
 
-    const [currentData, validator] = [this.createNewObject(), this.createRowValidator(options)];
-
-    const editing = (options.editing !== false); // true by default
+    const editing = (options?.editing !== false); // true by default
     const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = TableElementFactory.createTableElement({
       id,
@@ -134,7 +148,71 @@ export class TableDataSource<T,
         this.rowsSubject.next(rows);
       }
     }
+
+    // New row is not confirmed: remember it
+    if (editing) {
+      this._newElement = newElement;
+    }
+
+    // Notify the changes
+    else if (!options || options.emitEvent !== false){
+      this.datasourceSubject.next(this.getDataFromRows(rows));
+    }
+
     return newElement;
+  }
+
+
+  /**
+   * Pushing new data row in the table.
+   * @param originalData data to insert
+   * @param insertAt: insert the new element at specified position
+   * @param options
+   */
+  async addMany(originalData: T[], insertAt?: number, options?: {editing?: boolean, emitEvent?: boolean}): Promise<R[]|undefined> {
+    if (this.hasNewElement) {
+      if (!this._config.suppressErrors) {
+        console.warn('Cannot add new row, because already has nex row. Please confirm it first');
+      }
+      return; // Cannot add if still have some new element
+    }
+
+    const editing = options?.editing === true; // false by default
+
+    // Create new rows:
+    // WARNING: ids will be bad. Need to be recomputed (see bellow)
+    const newElements = this.createRowsFromData(originalData, {editing});
+
+    // Retrieve actual rows array
+    let rows = this.rowsSubject.getValue();
+
+    // Insert into rows array
+    if (insertAt) {
+      rows.splice(insertAt, 0, ...newElements);
+      const refreshStartIndex = this._config.prependNewElements ? insertAt + newElements.length - 1 : insertAt;
+      this.updateRowIds(refreshStartIndex, rows);
+    } else {
+      if (this._config.prependNewElements) {
+        rows = newElements.concat(...rows);
+        this.updateRowIds(newElements.length, rows);
+      } else {
+        rows = rows.concat(...newElements);
+        this.updateRowIds(rows.length - newElements.length, rows);
+      }
+    }
+
+    this.rowsSubject.next(rows);
+
+    if (editing) {
+      // New rows are still editing: do not emit changes
+    }
+
+    // New rows have been confirmed: notify changes
+    else if (!options || options.emitEvent !== false){
+      this.updateDatasourceFromRows(this.rowsSubject.getValue());
+    }
+
+    return newElements;
   }
 
   confirmEditCreate(row: R, options = {emitEvent: true}): boolean {
@@ -167,10 +245,11 @@ export class TableDataSource<T,
 
     const source = this.rowsSubject.getValue();
     row.id = source.length - 1;
+    this._newElement = null;
     this.rowsSubject.next(source);
     row.editing = false;
 
-    if (options.emitEvent) {
+    if (!options || options.emitEvent != false) {
       this.updateDatasourceFromRows(source);
     }
 
@@ -201,7 +280,7 @@ export class TableDataSource<T,
     }
     row.editing = false;
 
-    if (options.emitEvent) {
+    if (!options || options.emitEvent !== false) {
       this.updateDatasourceFromRows(source);
     }
     return true;
@@ -228,11 +307,14 @@ export class TableDataSource<T,
     source.splice(index, 1);
     this.updateRowIds(index, source);
 
+    if (id === -1) this._newElement = null; // Forget the new element
+
     this.rowsSubject.next(source);
 
-    if (id !== -1 && options.emitEvent) {
+    if (id !== -1 && (!options || options.emitEvent !== false)) {
       this.updateDatasourceFromRows(source);
     }
+
     return true;
   }
 
@@ -261,15 +343,17 @@ export class TableDataSource<T,
    * @param direction Direction: negative value for up, positive value for down
    */
   move(id: number, direction: number): boolean {
-    if (direction === 0) {
-      return false;
-    }
+    if (!direction) return false;
 
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
     moveItemInArray(source, index, index + direction);
-    this.updateRowIds(0, source);
+
+    const refreshStartIndex = this._config.prependNewElements
+      ? Math.max(index, index + direction)
+      : Math.min(index, index + direction);
+    this.updateRowIds(refreshStartIndex, source);
 
     this.rowsSubject.next(source);
 
@@ -297,7 +381,7 @@ export class TableDataSource<T,
 
     // Update datasource, if some rows has been confirmed (=changed)
     const confirmedRowCount = confirmResults.filter(ok => ok).length
-    if (confirmedRowCount && options.emitEvent) {
+    if (confirmedRowCount > 0 && (!options || options.emitEvent !== false)) {
       this.updateDatasourceFromRows(this.rowsSubject.getValue())
     }
 
@@ -332,7 +416,7 @@ export class TableDataSource<T,
       const rows = this.createRowsFromData(data);
       this.rowsSubject.next(rows);
 
-      if (options.emitEvent) {
+      if (!options || options.emitEvent !== false) {
         this.datasourceSubject.next(data);
       }
     }
@@ -400,6 +484,9 @@ export class TableDataSource<T,
 
     for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
       if (source[index].id !== -1) {
+        // DEBUG
+        //const newId = this.getRowIdFromIndex(index, source.length);
+        //console.debug(`Updating row id ${source[index].id} -> ${newId}`);
         source[index].id = this.getRowIdFromIndex(index, source.length);
       }
     }
@@ -430,19 +517,23 @@ export class TableDataSource<T,
   /**
    * From an array of data, it returns rows containing the original data.
    * @param arrayData Data from which create the rows.
+   * @param options
    */
-  protected createRowsFromData(arrayData: T[]): R[] {
+  protected createRowsFromData(arrayData: T[], options = {editing : false}): R[] {
 
     // Create many validators (batch mode)
-    const validators = this.createRowValidators(arrayData.length, {editing: false});
+    const validators = this.createRowValidators(arrayData.length);
+
+    const editing  = options.editing === true; // false by default (e.g. when initial data)
 
     return arrayData.map<R>((data, index) => {
       return TableElementFactory.createTableElement({
         id: this.getRowIdFromIndex(index, arrayData.length),
-        editing: false,
+        editing,
         currentData: data,
-        source: this,
-        validator: validators[index]
+        validator: validators[index],
+        // Link to datasource
+        source: this
       });
     });
   }
@@ -467,8 +558,10 @@ export class TableDataSource<T,
   protected createRowValidator(options = {editing: true}): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
-    if (options.editing === false) {
-      validator.disable({emitEvent: false});
+
+    // Disable if ask
+    if (options.editing === false && validator.enabled) {
+      validator.disable();
     }
     return validator;
   }
@@ -516,6 +609,9 @@ export class TableDataSource<T,
               return data.slice(range.start, range.end);
             }
             return data.slice(range.start);
+          }
+          if (range.end < data.length) {
+            return data.slice(0, range.end);
           }
           return data;
         })

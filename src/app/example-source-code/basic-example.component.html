@@ -1,0 +1,8 @@
+
+<app-person-list-reactive-forms [personList]="personList" #reactiveFormsList
+(personListChange)="personListChanged($event)"
+  ></app-person-list-reactive-forms>
+
+<app-person-list-template-driven [personList]="personList" #templateDrivenList
+(personListChange)="personListChanged($event)"
+></app-person-list-template-driven>

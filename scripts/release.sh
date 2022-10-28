@@ -43,7 +43,9 @@ sed -i "s/version\": \"$current\"/version\": \"$version\"/g" package.json
 [[ $? -ne 0 ]] && exit 1
 
 ## Prepare dependencies
-npm install
+if [[ ! -d "node_modules" ]]; then
+  npm install
+fi
 
 ## Publish
 npm run publish

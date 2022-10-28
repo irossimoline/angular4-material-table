@@ -44,3 +44,7 @@ testem.log
 .DS_Store
 Thumbs.db
 /.local/
+
+# npm/yarn
+yarn.lock
+package-lock.json

@@ -113,7 +113,8 @@ export class AsyncTableDataSource<T,
 
     const rows = this.rowsSubject.getValue();
 
-    const [currentData, validator] = [options?.originalData || this.createNewObject(), this.createRowValidator({editing: options?.editing})];
+    const currentData = options?.originalData || this.createNewObject();
+    const validator = this.createRowValidator({editing: options?.editing});
 
     const editing = (options?.editing !== false); // true by default
     const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);

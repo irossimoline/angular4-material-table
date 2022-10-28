@@ -1,5 +1,7 @@
 
 <h1>Reactive form example (async validator):</h1>
+<p>+ Using datasource config:</p>
+<pre>{{dataSource.config|json}}</pre>
 
 <div class="wrapper mat-elevation-z2">
   <mat-table [dataSource]="dataSource">
@@ -50,7 +52,7 @@
           <mat-icon>done_all</mat-icon> Validate all
         </button>
 
-        <button mat-button color="accent" (click)="dataSource.addMany(generatePersons(), 1)">
+        <button mat-button color="accent" (click)="dataSource.addMany(generatePersons())">
           <mat-icon>done_all</mat-icon> Add many
         </button>
       </mat-header-cell>

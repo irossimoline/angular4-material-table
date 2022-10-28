@@ -33,7 +33,7 @@ export class PersonListReactiveFormsComponent implements OnInit {
       Person,
       this.personValidator,
       {
-        prependNewElements: true,
+        prependNewElements: false,
         suppressErrors: !environment.production
       });
 

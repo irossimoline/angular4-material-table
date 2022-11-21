@@ -560,7 +560,7 @@ export class TableDataSource<T,
     const validator = this.validatorService.getRowValidator();
 
     // Disable if ask
-    if (options.editing === false) {
+    if (options.editing === false && validator.enabled) {
       validator.disable();
     }
     return validator;

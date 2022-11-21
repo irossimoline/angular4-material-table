@@ -520,11 +520,10 @@ export class TableDataSource<T,
    * @param options
    */
   protected createRowsFromData(arrayData: T[], options = {editing : false}): R[] {
+    const editing  = options.editing === true;
 
     // Create many validators (batch mode)
-    const validators = this.createRowValidators(arrayData.length);
-
-    const editing  = options.editing === true; // false by default (e.g. when initial data)
+    const validators = this.createRowValidators(arrayData.length, {editing});
 
     return arrayData.map<R>((data, index) => {
       return TableElementFactory.createTableElement({
@@ -556,11 +555,12 @@ export class TableDataSource<T,
   }
 
   protected createRowValidator(options = {editing: true}): UntypedFormGroup {
-    if (!this.validatorService) return null;
+    if (!this.validatorService) return null; // No validators
+
     const validator = this.validatorService.getRowValidator();
 
     // Disable if ask
-    if (options.editing === false && validator.enabled) {
+    if (options.editing === false) {
       validator.disable();
     }
     return validator;
@@ -574,7 +574,10 @@ export class TableDataSource<T,
    */
   protected createRowValidators(count: number, options = {editing: false}): UntypedFormGroup[] {
     const validators = new Array<UntypedFormGroup>(count);
-    for (let i = 0; i<count; i++) {
+
+    if (!this.validatorService) return validators; // No validator
+
+    for (let i = 0; i < count; i++) {
       validators[i] = this.createRowValidator(options);
     }
     return validators;

@@ -1,6 +1,5 @@
 import {TableElementReactiveForms} from './table-element-reactive-forms';
 import {TableElementTemplateDriven} from './table-element-template-driven';
-import {AsyncTableElementReactiveForms} from './async/async-table-element-reactive-forms';
 
 export class TableElementFactory {
 

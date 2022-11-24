@@ -98,10 +98,10 @@ export class TableDataSource<T,
   protected checkValidatorFields() {
     if (this._config.suppressErrors) return; // Skip, as error will not be logged
 
-    const formGroup = this.createRowValidator();
-    if (formGroup != null) {
+    const validator = this.createRowValidator();
+    if (validator != null) {
       const rowKeys = Object.keys(this.createNewObject());
-      const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
+      const invalidKeys = Object.keys(validator.controls).filter(key => !rowKeys.some(x => x === key));
       if (invalidKeys.length > 0) {
         console.error('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
       }
@@ -560,7 +560,7 @@ export class TableDataSource<T,
     const validator = this.validatorService.getRowValidator();
 
     // Disable if ask
-    if (options.editing === false && validator.enabled) {
+    if (options.editing === false) {
       validator.disable();
     }
     return validator;

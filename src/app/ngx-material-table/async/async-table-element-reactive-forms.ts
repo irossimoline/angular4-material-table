@@ -62,7 +62,9 @@ export class AsyncTableElementReactiveForms<T> extends AsyncTableElement<T> {
 
         // Wait end of async validation
         if (this.validator.pending) {
-          console.log('WAITING validation');
+          // DEBUG
+          // console.debug('WAITING validation');
+
           await waitWhilePending(this.validator);
         }
 

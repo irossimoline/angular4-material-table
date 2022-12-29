@@ -11,6 +11,7 @@ Supported angular versions:
 - Angular 10 (v0.10.0)
 - Angular 11 (v0.11.0 and v0.12.0)
 - Angular 14 (v0.14.0)
+- Angular 15 (v0.15.0)
 
 ![@e-is/ngx-material-table](https://i.imgur.com/ufilXlv.gif)
 
@@ -41,7 +42,7 @@ Using this extension, you can set CDK data-table `datasource` with an instance o
 
 Using `TableDataSource` allows you to have some row related methods and data to implement add/edit/remove elements:
 ```typescript
-class AsyncTableElement<T> {
+class TableElement<T> {
   id: number;
   editing: boolean;
   currentData?: T;
@@ -86,8 +87,8 @@ Angular material table use example:
 #### Optional libraries
 Optional libraries used in the example:
 ```
-"@angular/material": "14.2.5",
-"@angular/forms": "14.2.5", // <- For inline validation
+"@angular/material": "15.0.3",
+"@angular/forms": 15.0.4", // <- For inline validation
 "material-design-icons": "^3.0.1"
 ```
 

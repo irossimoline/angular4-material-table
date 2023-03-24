@@ -1,5 +1,8 @@
 import {AsyncTableElement} from './async-table-element';
-import * as clone from 'clone';
+import * as cloneImported from 'clone';
+import {unwrapESModule} from '../modules';
+
+const clone = unwrapESModule<typeof cloneImported>(cloneImported);
 
 
 export class AsyncTableElementTemplateDriven<T> extends AsyncTableElement<T> {

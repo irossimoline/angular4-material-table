@@ -16,7 +16,7 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef> Name </th>
       <td mat-cell *matCellDef="let row">
-        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <mat-form-field>
           <input [formControl]="row.validator.controls.name" placeholder="Name" matInput>
           <mat-error *ngIf="row.validator.controls.name.hasError('required')">
             Required
@@ -33,7 +33,7 @@
     <ng-container matColumnDef="age">
       <th mat-header-cell *matHeaderCellDef> Age </th>
       <td mat-cell *matCellDef="let row">
-        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <mat-form-field>
           <input [formControl]="row.validator.controls.age" type="number" placeholder="Age" matInput>
           <mat-error *ngIf="row.validator.controls.age.hasError('min')">
             Should be greater than 0

@@ -12,7 +12,7 @@
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <mat-form-field>
           <input matInput [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing">
         </mat-form-field>
       </mat-cell>
@@ -21,7 +21,7 @@
     <ng-container matColumnDef="age">
       <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <mat-form-field>
           <input matInput type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing">
         </mat-form-field>
       </mat-cell>

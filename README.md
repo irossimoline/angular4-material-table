@@ -1,29 +1,30 @@
-# Angular4 material table (angular4+)
+# Angular material table (Angular 10+)
+
+**Forked from [angular4-material-table](https://github.com/irossimoline/angular4-material-table)**
 
 This project extends `@angular/cdk` data-table, also used in `@angular/material` table.
 
 It extends `@angular/cdk/collections` DataSource in order to include a row structure, allowing row creation, inline row edition, deletion and validation.
 
 Supported angular versions: 
-- Angular 4 (v0.1.8)
-- Angular 5 (v0.2.0)
-- Angular 6 (v0.6.0)
-- Angular 7 (v0.7.0)
-- Angular 8 (v0.8.0)
+- Angular <= 9: Please use [angular4-material-table](https://github.com/irossimoline/angular4-material-table)
+- Angular 10 (v0.10.0)
+- Angular 11 (v0.11.0 and v0.12.0)
+- Angular 14 (v0.14.0)
 
-![angular4-material-table](https://i.imgur.com/ufilXlv.gif)
+![@e-is/ngx-material-table](https://i.imgur.com/ufilXlv.gif)
 
 ## Installation
 
 To install the package run:
 
-`npm install angular4-material-table`
+`npm install @e-is/ngx-material-table`
 
 ## Example
 
-Example of using `angular4-material-table`:
+Example of using `@e-is/ngx-material-table`:
 
-![angular4-material-table](https://i.imgur.com/vncajJG.png)
+![@e-is/ngx-material-table](https://i.imgur.com/vncajJG.png)
 
 ![Other example](https://i.imgur.com/5ed814s.png)
 
@@ -40,11 +41,11 @@ Using this extension, you can set CDK data-table `datasource` with an instance o
 
 Using `TableDataSource` allows you to have some row related methods and data to implement add/edit/remove elements:
 ```typescript
-class TableElement<T> {
+class AsyncTableElement<T> {
   id: number;
   editing: boolean;
   currentData?: T;
-  originalData: T;
+  originalData?: T;
   source: TableDataSource<T>;
   validator: FormGroup; // Used only in reactive forms.
 
@@ -71,23 +72,23 @@ class TableDataSource<T> {
 
   createNew(): void;
 
-  getRow(id: number): TableElement<T>;
+  getRow(id: number): AsyncTableElement<T>;
 }
 ```
 
 ### Angular4 material table example
 
-Angular 4 material table use example:
-![Example of angular4-material-table use](https://i.imgur.com/ath56FU.png)
+Angular material table use example:
+![Example of @e-is/ngx-material-table use](https://i.imgur.com/ath56FU.png)
 
 [See this package in action](https://stackblitz.com/edit/angular-tj9f6y)
 
 #### Optional libraries
 Optional libraries used in the example:
 ```
-"@angular/material": "2.0.0-beta.12",
-"@angular/forms": "4.4.4", // <- For inline validation
-"font-awesome": "4.7.0"
+"@angular/material": "14.2.5",
+"@angular/forms": "14.2.5", // <- For inline validation
+"material-design-icons": "^3.0.1"
 ```
 
 #### person-list-reactive-forms.component.html
@@ -98,16 +99,16 @@ Optional libraries used in the example:
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input [formControl]="row.validator.controls['name']" placeholder="Name" matInput>
+      <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <input matInput [formControl]="row.validator.controls['name']" placeholder="Name">
       </mat-form-field>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="age">
     <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
-        <input [formControl]="row.validator.controls['age']" type="number" placeholder="Age" matInput>
+      <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+        <input matInput [formControl]="row.validator.controls['age']" type="number" placeholder="Age">
       </mat-form-field>
     </mat-cell>
   </ng-container>
@@ -116,15 +117,16 @@ Optional libraries used in the example:
       <button mat-icon-button color="accent" (click)="dataSource.createNew()"><i class="fa fa-plus mat-icon"></i></button>
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <button *ngIf="!row.editing" mat-icon-button color="primary" focusable="false" (click)="row.startEdit()">
-            <i class="fa fa-pencil mat-icon"></i>
-          </button>
-      <button *ngIf="row.editing" mat-icon-button color="primary" focusable="false" (click)="row.confirmEditCreate()">
-            <i class="fa fa-check mat-icon"></i>
-          </button>
-      <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
-            <i class="fa fa-times mat-icon"></i>
-          </button>
+      <button *ngIf="!row.editing" mat-icon-button color="primary" (click)="row.startEdit()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
+        <mat-icon>done</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="row.cancelOrDelete()">
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
+      </button>
     </mat-cell>
   </ng-container>
 
@@ -141,7 +143,7 @@ Optional libraries used in the example:
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
+      <mat-form-field [floatLabel]="row.editing ? 'float' : 'never'">
         <input [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing" matInput>
       </mat-form-field>
     </mat-cell>
@@ -149,7 +151,7 @@ Optional libraries used in the example:
   <ng-container matColumnDef="age">
     <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-form-field floatPlaceholder="{{ row.editing ? 'float' : 'never'}}">
+      <mat-form-field [floatLabel]="row.editing ? 'float' : 'never'">
         <input type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing" matInput>
       </mat-form-field>
     </mat-cell>
@@ -159,15 +161,16 @@ Optional libraries used in the example:
       <button mat-icon-button color="accent" (click)="dataSource.createNew()"><i class="fa fa-plus mat-icon"></i></button>
     </mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <button *ngIf="!row.editing" mat-icon-button color="primary" focusable="false" (click)="row.startEdit()">
-            <i class="fa fa-pencil mat-icon"></i>
-          </button>
-      <button *ngIf="row.editing" mat-icon-button color="primary" focusable="false" (click)="row.confirmEditCreate()">
-            <i class="fa fa-check mat-icon"></i>
-          </button>
-      <button mat-icon-button color="primary" focusable="false" (click)="row.cancelOrDelete()">
-            <i class="fa fa-times mat-icon"></i>
-          </button>
+      <button *ngIf="!row.editing" mat-icon-button color="primary" (click)="row.startEdit()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button *ngIf="row.editing" mat-icon-button color="primary" (click)="row.confirmEditCreate()">
+        <mat-icon>done</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="row.cancelOrDelete()">
+        <mat-icon *ngIf="row.editing">undo</mat-icon>
+        <mat-icon *ngIf="!row.editing">delete</mat-icon>
+      </button>
     </mat-cell>
   </ng-container>
 
@@ -226,5 +229,8 @@ class PersonValidatorService implements ValidatorService {
 Any suggestion or contribution will be appreciated.
 
 
+## Change log
+
+See [Change log](./doc/changelog.md)
 
 

@@ -1,56 +1,111 @@
 {
-  "version": "0.8.0",
-  "name": "angular4-material-table",
-  "description": "Angular 4 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
+  "name": "@e-is/ngx-material-table",
+  "description": "Angular 11 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
+  "version": "0.14.12",
+  "license": "MIT",
+  "author": "Ignacio Rossi <irossimoline>",
   "keywords": [
     "angular",
-    "angular4",
+    "angular 14",
     "table",
     "inline validation",
-    "angular material table"
+    "material design",
+    "angular material table",
+    "ngx material table",
+    "ngx table"
   ],
-  "scripts": {
-    "transpile": "ngc",
-    "package": "rollup -c",
-    "minify": "uglifyjs dist/bundles/angular4-material-table.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundles/angular4-material-table.umd.min.js",
-    "build": "npm run transpile && npm run package && npm run minify"
-  },
-  "dependencies": {
-    "@angular/common": "^8.0.2",
-    "@angular/core": "^8.0.2",
-    "@angular/forms": "^8.0.2",
-    "@angular/cdk": "^8.0.1",
-    "core-js": "^2.5.7",
-    "rxjs": "^6.5.2",
-    "zone.js": "^0.9.1",
-    "lodash.clonedeep": "^4.5.0"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "~0.800.3",
-    "@angular/cli": "^8.0.3",
-    "@angular/compiler": "^8.0.2",
-    "@angular/compiler-cli": "^8.0.2",
-    "@angular/language-service": "^8.0.2",
-    "@types/jasmine": "2.8.8",
-    "@types/node": "~10.14.9",
-    "codelyzer": "~4.5.0",
-    "rollup": "^0.60.2",
-    "ts-node": "~6.0.3",
-    "tslint": "~5.10.0",
-    "typescript": "~3.4.5",
-    "uglify-js": "^3.6.0"
-  },
-  "main": "bundles/angular4-material-table.umd.js",
-  "module": "index.js",
-  "typings": "index.d.ts",
-  "author": "Ignacio Rossi <irossimoline>",
-  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/irossimoline/angular4-material-table.git"
+    "url": "https://github.com/e-is/ngx-material-table.git"
   },
-  "homepage": "https://github.com/irossimoline/angular4-material-table",
+  "homepage": "https://github.com/e-is/ngx-material-table",
   "bugs": {
-    "url": "https://github.com/irossimoline/angular4-material-table/issues"
+    "url": "https://github.com/e-is/ngx-material-table/issues"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --configuration development --port 4201",
+    "build": "ng build --configuration production",
+    "test": "ng test",
+    "lint": "ng lint",
+    "packagr": "ng-packagr -p ng-package.json",
+    "publish": "npm run packagr && cd dist && npm publish",
+    "publish-dev": "npm run packagr && cd dist && npm publish --userconfig=.local/.npmrc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "bundles/ngx-material-table.umd.js",
+  "module": "index.js",
+  "typings": "index.d.ts",
+  "private": false,
+  "dependencies": {
+    "clone": "^2.1.2"
+  },
+  "devDependencies": {
+    "ng-table-virtual-scroll": "^1.4.1",
+    "@angular-devkit/architect": "~0.1402.12",
+    "@angular-devkit/build-angular": "~14.2.12",
+    "@angular-devkit/core": "~14.2.12",
+    "@angular-devkit/schematics": "~14.2.12",
+    "@angular-eslint/builder": "~14.4.0",
+    "@angular-eslint/eslint-plugin": "~14.4.0",
+    "@angular-eslint/eslint-plugin-template": "~14.4.0",
+    "@angular-eslint/schematics": "~14.4.0",
+    "@angular-eslint/template-parser": "~14.4.0",
+    "@angular/animations": "~14.3.0",
+    "@angular/cdk": "~14.2.7",
+    "@angular/cli": "~14.2.12",
+    "@angular/router": "~14.3.0",
+    "@angular/common": "~14.3.0",
+    "@angular/compiler": "~14.3.0",
+    "@angular/compiler-cli": "~14.3.0",
+    "@angular/core": "~14.3.0",
+    "@angular/forms": "~14.3.0",
+    "@angular/language-service": "~14.3.0",
+    "@angular/material": "~14.2.5",
+    "@angular/platform-browser": "~14.3.0",
+    "@angular/platform-browser-dynamic": "~14.3.0",
+    "@rollup/plugin-commonjs": "~17.0.0",
+    "@rollup/plugin-node-resolve": "~14.1.0",
+    "@types/jasmine": "~3.10.6",
+    "@types/jasminewd2": "~2.0.10",
+    "@types/node": "~14.18.32",
+    "@typescript-eslint/eslint-plugin": "4.33.0",
+    "@typescript-eslint/parser": "4.33.0",
+    "core-js": "^3.21.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-jsdoc": "latest",
+    "eslint-plugin-prefer-arrow": "latest",
+    "jasmine-core": "~3.8.0",
+    "jasmine-spec-reporter": "~7.0.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "~3.0.3",
+    "karma-jasmine": "~4.0.1",
+    "karma-jasmine-html-reporter": "~1.6.0",
+    "material-design-icons": "^3.0.1",
+    "ng-packagr": "~14.2.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.6.2",
+    "rollup": "^2.34.0",
+    "rxjs": "^6.6.7",
+    "sass": "^1.35.2",
+    "sass-loader": "^10.2.0",
+    "ts-node": "~8.10.2",
+    "tslib": "~2.3.0",
+    "typescript": "~4.6.4",
+    "zone.js": "~0.11.8"
+  },
+  "peerDependencies": {
+    "@angular/compiler-cli": "~14.3.0",
+    "webpack": "^5.74.0"
+  },
+  "engines": {
+    "node": ">= 14.20.0",
+    "npm": ">= 8.17.0",
+    "yarn": ">= 1.22.0"
   }
 }

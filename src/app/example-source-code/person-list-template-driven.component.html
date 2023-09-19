@@ -1,0 +1,58 @@
+<h1>Template driven example:</h1>
+
+<div class="wrapper mat-elevation-z2">
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        {{row.id !== -1 ? row.id : ''}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+          <input matInput [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing">
+        </mat-form-field>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="age">
+      <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-form-field [floatLabel]="row.editing ? 'auto' : 'never'">
+          <input matInput type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing">
+        </mat-form-field>
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="actionsColumn">
+      <mat-header-cell *matHeaderCellDef>
+        <button mat-icon-button color="accent" (click)="dataSource.createNew()">
+          <mat-icon>add_circle</mat-icon>
+        </button>
+        <button mat-button color="accent" (click)="dataSource.confirmAllRows()">
+          <mat-icon>done_all</mat-icon> Validate all
+        </button>
+        <button mat-button color="accent" (click)="dataSource.addMany(generatePersons())">
+          <mat-icon>done_all</mat-icon> Add many
+        </button>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <button *ngIf="!row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.startEdit()">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button *ngIf="row.editing" mat-icon-button color="primary" tabindex="-1" (click)="row.confirmEditCreate()">
+          <mat-icon>done</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" tabindex="-1" (click)="row.cancelOrDelete()">
+          <mat-icon *ngIf="row.editing">undo</mat-icon>
+          <mat-icon *ngIf="!row.editing">delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>

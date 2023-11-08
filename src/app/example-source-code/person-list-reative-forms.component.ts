@@ -24,7 +24,7 @@ export class PersonListReactiveFormsComponent implements OnInit {
   dataSource: TableDataSource<Person>;
 
   get displayedColumns(): string[] {
-    if (environment.production) return this._displayedColumns.splice(1) // Remove 'id'
+    if (environment.production) return this._displayedColumns.splice(1); // Remove 'id'
     return this._displayedColumns;
   }
 

@@ -12,6 +12,7 @@ Supported angular versions:
 - Angular 11 (v0.11.0 and v0.12.0)
 - Angular 14 (v0.14.0)
 - Angular 15 (v0.15.0)
+- Angular 16 (v0.16.0)
 
 ![@e-is/ngx-material-table](https://i.imgur.com/ufilXlv.gif)
 
@@ -87,8 +88,8 @@ Angular material table use example:
 #### Optional libraries
 Optional libraries used in the example:
 ```
-"@angular/material": "15.0.3",
-"@angular/forms": 15.0.4", // <- For inline validation
+"@angular/material": "16.2.11",
+"@angular/forms": 16.2.12", // <- For inline validation
 "material-design-icons": "^3.0.1"
 ```
 

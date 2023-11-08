@@ -41,7 +41,6 @@ export class ScrollableTableDataSource<T,
 
   /**
    * Say if there is a new (and not confirmed) row
-   * @param source
    */
   get hasNewElement(): boolean {
     return !!this._newElement;
@@ -104,7 +103,7 @@ export class ScrollableTableDataSource<T,
 
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
-   * @param insertAt: insert the new element at specified position
+   * @param insertAt
    * @param options
    */
   async createNew(insertAt?: number, options?: {editing?: boolean, originalData?: T, emitEvent?: boolean;}): Promise<R|undefined> {
@@ -159,7 +158,7 @@ export class ScrollableTableDataSource<T,
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
    * @param originalData data to insert
-   * @param insertAt: insert the new element at specified position
+   * @param insertAt
    * @param options
    */
   async addMany(originalData: T[], insertAt?: number, options?: {editing?: boolean, emitEvent?: boolean}): Promise<R[]|undefined> {
@@ -354,7 +353,7 @@ export class ScrollableTableDataSource<T,
   }
 
   async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
-    return this.confirmRows(this.rowsSubject.getValue(), options)
+    return this.confirmRows(this.rowsSubject.getValue(), options);
   }
 
   async confirmRows(source: R[], options = {emitEvent: true}): Promise<boolean> {
@@ -370,9 +369,9 @@ export class ScrollableTableDataSource<T,
     );
 
     // Update datasource, if some rows has been confirmed (=changed)
-    const confirmedRowCount = confirmResults.filter(ok => ok).length
+    const confirmedRowCount = confirmResults.filter(ok => ok).length;
     if (confirmedRowCount > 0 && (!options || options.emitEvent !== false)) {
-      this.updateDatasourceFromRows(this.rowsSubject.getValue())
+      this.updateDatasourceFromRows(this.rowsSubject.getValue());
     }
 
     // Return if all rows has been confirmed
@@ -486,7 +485,7 @@ export class ScrollableTableDataSource<T,
   protected getDataFromRows(rows: R[]): T[] {
     const mapToDataFn = !this._config.restoreOriginalDataOnCancel
       ? (row => row.originalData || row.currentData)
-      : (row => row.currentData) // Always return currentData, if orginalData is NOT update at each edition
+      : (row => row.currentData); // Always return currentData, if orginalData is NOT update at each edition
     return rows
       .filter(row => row.id !== -1)
       .map<T>(mapToDataFn);

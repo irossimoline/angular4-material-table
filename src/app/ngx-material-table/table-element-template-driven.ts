@@ -14,6 +14,7 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
     return undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   set validator(value: any) {
   }
 

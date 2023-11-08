@@ -1,3 +1,5 @@
+## 0.16.0
+- [enh] Support Angular 16
 
 ## 0.14.4
 - [fix] TableDataSource: when opts.editing is undefined, apply the default value

@@ -2,12 +2,9 @@ import {ValidatorService} from '../ngx-material-table/validator.service';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PersonValidatorService} from './person-list.validator';
 import {environment} from '../../environments/environment';
-import {Person, generatePersons} from './person.model';
-import {AsyncTableDataSource} from '../ngx-material-table/async/async-table-data-source';
-import {ScrollableTableDataSource} from "../ngx-material-table/scrollable/scrollable-table-data-source";
-import {TableVirtualScrollDataSource} from "ng-table-virtual-scroll";
-import {TableElement} from "../ngx-material-table/table-element";
-import {AsyncTableElement} from "../ngx-material-table/scrollable/async-table-element";
+import {generatePersons, Person} from './person.model';
+import {ScrollableTableDataSource} from '../ngx-material-table/scrollable/scrollable-table-data-source';
+import {AsyncTableElement} from '../ngx-material-table/scrollable/async-table-element';
 
 @Component({
   selector: 'app-person-list-scrollable',
@@ -22,7 +19,7 @@ export class PersonListScrollableComponent implements OnInit {
   private _displayedColumns = ['id', 'name', 'age', 'actionsColumn'];
 
   get displayedColumns(): string[] {
-    if (environment.production) return this._displayedColumns.splice(1) // Remove 'id'
+    if (environment.production) return this._displayedColumns.splice(1); // Remove 'id'
     return this._displayedColumns;
   }
 
@@ -55,7 +52,6 @@ export class PersonListScrollableComponent implements OnInit {
   generatePersons = generatePersons;
 
   async addRow() {
-    const row = await this.dataSource.createNew();
-
+    return await this.dataSource.createNew();
   }
 }

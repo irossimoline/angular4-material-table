@@ -17,12 +17,9 @@ export class PersonListTemplateDrivenComponent implements OnInit {
   @Output() personListChange = new EventEmitter<Person[]>();
 
   get displayedColumns(): string[] {
-    if (environment.production) return this._displayedColumns.splice(1) // Remove 'id'
+    if (environment.production) return this._displayedColumns.splice(1); // Remove 'id'
     return this._displayedColumns;
   }
-
-  constructor() { }
-
 
   ngOnInit() {
     this.dataSource = new TableDataSource<Person>(this.personList || [],

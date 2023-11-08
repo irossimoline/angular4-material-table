@@ -13,6 +13,7 @@ export class AsyncTableElementTemplateDriven<T> extends AsyncTableElement<T> {
     return undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   set validator(value: any) {
   }
 

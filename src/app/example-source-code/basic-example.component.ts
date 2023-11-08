@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {generatePersons, Person} from './person.model';
 import {PersonListAsyncReactiveFormsComponent} from "./person-list-async-reative-forms.component";
 import {PersonListTemplateDrivenComponent} from "./person-list-template-driven.component";

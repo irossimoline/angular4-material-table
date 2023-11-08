@@ -5,7 +5,6 @@
 // --------------------------------------------------
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
 
-
 // --------------------------------------------------
 // Custom style
 // --------------------------------------------------
@@ -47,6 +46,14 @@ app-root {
   min-height: unset !important;
 }
 
+@import '@angular/material/theming';
+@include mat-core();
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$theming-material-components-primary: mat-palette($mat-indigo);
+$theming-material-components-accent: mat-palette($mat-pink, A200, A100, A400);
+
 // --------------------------------------------------
 // Material theme
 // --------------------------------------------------
@@ -72,4 +79,3 @@ $theme: mat.define-light-theme((
 // Import icons
 // --------------------------------------------------
 @import 'material-design-icons/iconfont/material-icons.css';
-

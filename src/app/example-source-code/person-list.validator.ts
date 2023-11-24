@@ -6,7 +6,7 @@ import {Injectable} from '@angular/core';
 export class PersonValidatorService implements ValidatorService {
   getRowValidator(): UntypedFormGroup {
     return new UntypedFormGroup({
-      name: new UntypedFormControl(null, Validators.required),
+      name: new UntypedFormControl(null, Validators.compose([Validators.required, Validators.minLength(2)])),
       age: new UntypedFormControl(null, Validators.compose([Validators.min(0), Validators.max(120)]))
     });
   }

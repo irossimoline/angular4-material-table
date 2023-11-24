@@ -1,3 +1,6 @@
+## 0.17.0
+- [enh] Support Angular 17
+
 ## 0.16.0
 - [enh] Support Angular 16
 

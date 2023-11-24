@@ -17,7 +17,7 @@
           <mat-error *ngIf="row.validator.controls.name.hasError('required')">
             Required
           </mat-error>
-          <mat-error *ngIf="row.validator.controls.name.hasError('minLength')">
+          <mat-error *ngIf="row.validator.controls.name.hasError('minlength')">
             Should have more than 2 caracters
           </mat-error>
           <mat-hint *ngIf="row.valid">

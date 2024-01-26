@@ -1,7 +1,7 @@
 {
   "name": "@e-is/ngx-material-table",
   "description": "Angular 17 table based on @angular/cdk table structure, to allow row insertion, edition, validation and deletion.",
-  "version": "0.17.1-rc1",
+  "version": "0.17.1-rc2",
   "license": "MIT",
   "author": "Ignacio Rossi <irossimoline>",
   "keywords": [
@@ -88,7 +88,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "material-design-icons": "^3.0.1",
-    "ng-packagr": "~17.0.2",
+    "ng-packagr": "~17.1.2",
     "ng-table-virtual-scroll": "^1.6.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.6.2",
@@ -98,8 +98,7 @@
     "sass-loader": "^10.2.0",
     "ts-node": "~8.10.2",
     "tslib": "~2.3.0",
-    "typescript": "~5.2.2",
-    "zone.js": "~0.14.2"
+    "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "webpack": "^5.89.0"

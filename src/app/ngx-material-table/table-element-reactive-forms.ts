@@ -1,8 +1,7 @@
-import {TableElement} from './table-element';
-import {UntypedFormGroup} from '@angular/forms';
+import { TableElement } from './table-element';
+import { UntypedFormGroup } from '@angular/forms';
 
 export class TableElementReactiveForms<T> extends TableElement<T> {
-
   validator: UntypedFormGroup;
 
   get currentData(): T {
@@ -48,17 +47,15 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
   }
 
   isValid(): boolean {
-
     // Enable temporarily the validator to get the valid status
     const disabled = this.validator.disabled;
     if (disabled) {
-      this.validator.enable({emitEvent: false, onlySelf: true});
-      this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
+      this.validator.enable({ emitEvent: false, onlySelf: true });
+      this.validator.updateValueAndValidity({ emitEvent: false, onlySelf: true });
     }
 
     try {
       if (!this.validator.valid) {
-
         // FIXME: enable this code, when isValid() will be async
         // Wait end of async validation
         //if (this.validator.pending) {
@@ -75,7 +72,7 @@ export class TableElementReactiveForms<T> extends TableElement<T> {
     } finally {
       // Re-disabled, if need
       if (disabled) {
-        this.validator.disable({emitEvent: false, onlySelf: true});
+        this.validator.disable({ emitEvent: false, onlySelf: true });
       }
     }
   }

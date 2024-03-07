@@ -1,8 +1,7 @@
-import {UntypedFormGroup} from '@angular/forms';
-import {AsyncTableDataSource} from './async-table-data-source';
+import { UntypedFormGroup } from '@angular/forms';
+import { AsyncTableDataSource } from './async-table-data-source';
 
 export abstract class AsyncTableElement<T> {
-
   id: number;
   originalData?: T;
   source: AsyncTableDataSource<T, any>;
@@ -40,7 +39,7 @@ export abstract class AsyncTableElement<T> {
     return this.source.startEdit(this);
   }
 
-  move(direction: number): Promise<boolean>  {
+  move(direction: number): Promise<boolean> {
     return this.source.move(this.id, direction);
   }
 

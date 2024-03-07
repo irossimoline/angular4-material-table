@@ -1,19 +1,19 @@
-import {CollectionViewer, DataSource, ListRange} from '@angular/cdk/collections';
-import {BehaviorSubject, Observable, Subject, Subscription} from 'rxjs';
-import {AsyncTableElementFactory} from './async-table-element.factory';
-import {ValidatorService} from '../validator.service';
-import {filter, map} from 'rxjs/operators';
-import {moveItemInArray} from '@angular/cdk/drag-drop';
-import {UntypedFormGroup} from '@angular/forms';
-import {TableDataSourceConfig} from '../table-data-source';
-import {AsyncTableElement} from './async-table-element';
+import { CollectionViewer, DataSource, ListRange } from '@angular/cdk/collections';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { AsyncTableElementFactory } from './async-table-element.factory';
+import { ValidatorService } from '../validator.service';
+import { filter, map } from 'rxjs/operators';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { UntypedFormGroup } from '@angular/forms';
+import { TableDataSourceConfig } from '../table-data-source';
+import { AsyncTableElement } from './async-table-element';
 
-export class AsyncTableDataSource<T,
+export class AsyncTableDataSource<
+  T,
   V extends ValidatorService = ValidatorService,
   C extends TableDataSourceConfig = TableDataSourceConfig,
-  R extends AsyncTableElement<T> = AsyncTableElement<T>
-  > extends DataSource<R> {
-
+  R extends AsyncTableElement<T> = AsyncTableElement<T>,
+> extends DataSource<R> {
   /**
    * Return the data array, of confirmed rows (currentData)
    */
@@ -57,14 +57,15 @@ export class AsyncTableDataSource<T,
     data: T[],
     dataType?: new () => T,
     protected validatorService?: V,
-    config?: C) {
+    config?: C
+  ) {
     super();
 
     this._config = {
       prependNewElements: false,
       suppressErrors: false,
       restoreOriginalDataOnCancel: false,
-      ...config
+      ...config,
     };
 
     if (dataType) {
@@ -90,7 +91,7 @@ export class AsyncTableDataSource<T,
     const formGroup = this.createRowValidator();
     if (formGroup != null) {
       const rowKeys = Object.keys(this.createNewObject());
-      const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
+      const invalidKeys = Object.keys(formGroup.controls).filter((key) => !rowKeys.some((x) => x === key));
       if (invalidKeys.length > 0) {
         console.error('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
       }
@@ -102,7 +103,7 @@ export class AsyncTableDataSource<T,
    * @param insertAt
    * @param options
    */
-  async createNew(insertAt?: number, options?: {editing?: boolean, originalData?: T, emitEvent?: boolean;}): Promise<R|undefined> {
+  async createNew(insertAt?: number, options?: { editing?: boolean; originalData?: T; emitEvent?: boolean }): Promise<R | undefined> {
     if (this.hasNewElement) {
       if (!this._config.suppressErrors) {
         console.warn('Cannot add new row, because already has nex row. Please confirm it first');
@@ -113,9 +114,9 @@ export class AsyncTableDataSource<T,
     const rows = this.rowsSubject.getValue();
 
     const currentData = options?.originalData || this.createNewObject();
-    const validator = this.createRowValidator({editing: options?.editing});
+    const validator = this.createRowValidator({ editing: options?.editing });
 
-    const editing = (options?.editing !== false); // true by default
+    const editing = options?.editing !== false; // true by default
     const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = AsyncTableElementFactory.createTableElement({
       id,
@@ -123,7 +124,7 @@ export class AsyncTableDataSource<T,
       currentData,
       validator,
       // Link to datasource
-      source: this
+      source: this,
     });
 
     if (insertAt) {
@@ -144,13 +145,12 @@ export class AsyncTableDataSource<T,
     }
 
     // Notify the changes
-    else if (!options || options.emitEvent !== false){
+    else if (!options || options.emitEvent !== false) {
       this.datasourceSubject.next(this.getDataFromRows(rows));
     }
 
     return newElement;
   }
-
 
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
@@ -158,7 +158,7 @@ export class AsyncTableDataSource<T,
    * @param insertAt
    * @param options
    */
-  async addMany(originalData: T[], insertAt?: number, options?: {editing?: boolean, emitEvent?: boolean}): Promise<R[]|undefined> {
+  async addMany(originalData: T[], insertAt?: number, options?: { editing?: boolean; emitEvent?: boolean }): Promise<R[] | undefined> {
     if (this.hasNewElement) {
       if (!this._config.suppressErrors) {
         console.warn('Cannot add new row, because already has nex row. Please confirm it first');
@@ -170,7 +170,7 @@ export class AsyncTableDataSource<T,
 
     // Create new rows:
     // WARNING: ids will be bad. Need to be recomputed (see bellow)
-    const newElements = this.createRowsFromData(originalData, {editing});
+    const newElements = this.createRowsFromData(originalData, { editing });
 
     // Retrieve actual rows array
     let rows = this.rowsSubject.getValue();
@@ -197,14 +197,14 @@ export class AsyncTableDataSource<T,
     }
 
     // New rows have been confirmed: notify changes
-    else if (!options || options.emitEvent !== false){
+    else if (!options || options.emitEvent !== false) {
       this.updateDatasourceFromRows(this.rowsSubject.getValue());
     }
 
     return newElements;
   }
 
-  confirmEditCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
+  confirmEditCreate(row: R, options = { emitEvent: true }): Promise<boolean> {
     if (row.id === -1) {
       return this.confirmCreate(row, options);
     } else {
@@ -212,7 +212,7 @@ export class AsyncTableDataSource<T,
     }
   }
 
-  cancelOrDelete(row: R, options = {emitEvent: true}): Promise<boolean> {
+  cancelOrDelete(row: R, options = { emitEvent: true }): Promise<boolean> {
     if (row.id === -1 || !row.editing) {
       return this.delete(row.id, options);
     } else {
@@ -226,7 +226,7 @@ export class AsyncTableDataSource<T,
    * @param row Row to be confirmed.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  async confirmCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
+  async confirmCreate(row: R, options = { emitEvent: true }): Promise<boolean> {
     const valid = await row.isValid();
     if (valid !== true) {
       return false;
@@ -251,7 +251,7 @@ export class AsyncTableDataSource<T,
    * @param row Row to be edited.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  async confirmEdit(row: R, options = {emitEvent: true}): Promise<boolean> {
+  async confirmEdit(row: R, options = { emitEvent: true }): Promise<boolean> {
     const valid = await row.isValid();
     if (valid !== true) {
       return false;
@@ -289,7 +289,7 @@ export class AsyncTableDataSource<T,
   /**
    * Delete the row with the index specified.
    */
-  async delete(id: number, options = {emitEvent: true}): Promise<boolean> {
+  async delete(id: number, options = { emitEvent: true }): Promise<boolean> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -339,9 +339,7 @@ export class AsyncTableDataSource<T,
 
     moveItemInArray(source, index, index + direction);
 
-    const refreshStartIndex = this._config.prependNewElements
-      ? Math.max(index, index + direction)
-      : Math.min(index, index + direction);
+    const refreshStartIndex = this._config.prependNewElements ? Math.max(index, index + direction) : Math.min(index, index + direction);
     this.updateRowIds(refreshStartIndex, source);
 
     this.rowsSubject.next(source);
@@ -352,24 +350,24 @@ export class AsyncTableDataSource<T,
     return true;
   }
 
-  async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
+  async confirmAllRows(options = { emitEvent: true }): Promise<boolean> {
     return this.confirmRows(this.rowsSubject.getValue(), options);
   }
 
-  async confirmRows(source: R[], options = {emitEvent: true}): Promise<boolean> {
-
+  async confirmRows(source: R[], options = { emitEvent: true }): Promise<boolean> {
     // Get editing rows
     const editingRows = this.getEditingRows(source);
     if (editingRows.length === 0) return true; // No row to confirm
 
     // Try to confirm each rows
     const confirmResults = await Promise.all(
-      editingRows
-        .map(row => this.confirmEditCreate(row, {emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after*/}))
+      editingRows.map((row) =>
+        this.confirmEditCreate(row, { emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after*/ })
+      )
     );
 
     // Update datasource, if some rows has been confirmed (=changed)
-    const confirmedRowCount = confirmResults.filter(ok => ok).length;
+    const confirmedRowCount = confirmResults.filter((ok) => ok).length;
     if (confirmedRowCount > 0 && (!options || options.emitEvent !== false)) {
       this.updateDatasourceFromRows(this.rowsSubject.getValue());
     }
@@ -386,7 +384,7 @@ export class AsyncTableDataSource<T,
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
-    return (index >= 0 && index < source.length) ? source[index] : null;
+    return index >= 0 && index < source.length ? source[index] : null;
   }
 
   /**
@@ -398,7 +396,7 @@ export class AsyncTableDataSource<T,
    * from 'datasourceSubject' with the updated data. If false, it doesn't
    * emit an event. True by default.
    */
-  updateDatasource(data: T[], options = {emitEvent: true}): void {
+  updateDatasource(data: T[], options = { emitEvent: true }): void {
     if (this.currentData !== data) {
       this.currentData = data;
 
@@ -423,7 +421,7 @@ export class AsyncTableDataSource<T,
    * Get editing rows
    */
   protected getEditingRows(source: R[]): R[] {
-    return source.filter(row => row.editing);
+    return source.filter((row) => row.editing);
   }
 
   /**
@@ -457,7 +455,7 @@ export class AsyncTableDataSource<T,
    * @param source
    */
   protected getIndexFromRowId(id: number, source: R[]): number {
-    return source.findIndex(element => element.id === id);
+    return source.findIndex((element) => element.id === id);
   }
 
   /**
@@ -468,7 +466,6 @@ export class AsyncTableDataSource<T,
    * @param source Array that contains the rows to be updated.
    */
   protected updateRowIds(initialIndex: number, source: R[]): void {
-
     const delta = this._config.prependNewElements ? -1 : 1;
 
     for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
@@ -486,12 +483,8 @@ export class AsyncTableDataSource<T,
    * @param rows Rows to extract the data.
    */
   protected getDataFromRows(rows: R[]): T[] {
-    const mapToDataFn = !this._config.restoreOriginalDataOnCancel
-      ? (row => row.originalData || row.currentData)
-      : (row => row.currentData); // Always return currentData, if orginalData is NOT update at each edition
-    return rows
-      .filter(row => row.id !== -1)
-      .map<T>(mapToDataFn);
+    const mapToDataFn = !this._config.restoreOriginalDataOnCancel ? (row) => row.originalData || row.currentData : (row) => row.currentData; // Always return currentData, if orginalData is NOT update at each edition
+    return rows.filter((row) => row.id !== -1).map<T>(mapToDataFn);
   }
 
   /**
@@ -508,12 +501,11 @@ export class AsyncTableDataSource<T,
    * @param arrayData Data from which create the rows.
    * @param options
    */
-  protected createRowsFromData(arrayData: T[], options = {editing : false}): R[] {
-
+  protected createRowsFromData(arrayData: T[], options = { editing: false }): R[] {
     // Create many validators (batch mode)
     const validators = this.createRowValidators(arrayData.length);
 
-    const editing  = options.editing === true; // false by default (e.g. when initial data)
+    const editing = options.editing === true; // false by default (e.g. when initial data)
 
     return arrayData.map<R>((data, index) => {
       return AsyncTableElementFactory.createTableElement({
@@ -522,7 +514,7 @@ export class AsyncTableDataSource<T,
         currentData: data,
         validator: validators[index],
         // Link to datasource
-        source: this
+        source: this,
       });
     });
   }
@@ -544,7 +536,7 @@ export class AsyncTableDataSource<T,
     }
   }
 
-  protected createRowValidator(options = {editing: true}): UntypedFormGroup {
+  protected createRowValidator(options = { editing: true }): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
 
@@ -561,9 +553,9 @@ export class AsyncTableDataSource<T,
    * @param options
    * @protected
    */
-  protected createRowValidators(count: number, options = {editing: false}): UntypedFormGroup[] {
+  protected createRowValidators(count: number, options = { editing: false }): UntypedFormGroup[] {
     const validators = new Array<UntypedFormGroup>(count);
-    for (let i = 0; i<count; i++) {
+    for (let i = 0; i < count; i++) {
       validators[i] = this.createRowValidator(options);
     }
     return validators;
@@ -579,39 +571,36 @@ export class AsyncTableDataSource<T,
 
     const range: ListRange = {
       start: 0,
-      end: -1
+      end: -1,
     };
     this.connectedViewers.push({
       viewer: collectionViewer,
       range,
-      subscription: collectionViewer.viewChange.subscribe(r => {
+      subscription: collectionViewer.viewChange.subscribe((r) => {
         range.start = r.start;
         range.end = r.end;
-      })
+      }),
     });
-    return this.rowsSubject.asObservable()
-      .pipe(
-        filter(data => data !== null && data !== undefined),
-        map(data => {
-          if (range.start > 0) {
-            if (range.end > range.start) {
-              return data.slice(range.start, range.end);
-            }
-            return data.slice(range.start);
+    return this.rowsSubject.asObservable().pipe(
+      filter((data) => data !== null && data !== undefined),
+      map((data) => {
+        if (range.start > 0) {
+          if (range.end > range.start) {
+            return data.slice(range.start, range.end);
           }
-          if (range.end < data.length) {
-            return data.slice(0, range.end);
-          }
-          return data;
-        })
-      );
-
-
+          return data.slice(range.start);
+        }
+        if (range.end < data.length) {
+          return data.slice(0, range.end);
+        }
+        return data;
+      })
+    );
   }
 
   disconnect(collectionViewer: CollectionViewer) {
     if (collectionViewer) {
-      const refIndex = this.connectedViewers.findIndex(r => r.viewer === collectionViewer);
+      const refIndex = this.connectedViewers.findIndex((r) => r.viewer === collectionViewer);
       if (refIndex !== -1) {
         const ref = this.connectedViewers.splice(refIndex, 1)[0];
         ref.subscription.unsubscribe();

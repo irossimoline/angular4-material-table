@@ -1,9 +1,8 @@
-import {UntypedFormGroup} from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
-import {TableDataSource} from './table-data-source';
+import { TableDataSource } from './table-data-source';
 
 export abstract class TableElement<T> {
-
   id: number;
   originalData?: T;
   source: TableDataSource<T, any, any, TableElement<any>>;

@@ -1,12 +1,10 @@
-import {TableElement} from './table-element';
+import { TableElement } from './table-element';
 import * as cloneImported from 'clone';
-import {unwrapESModule} from './modules';
+import { unwrapESModule } from './modules';
 
 const clone = unwrapESModule<typeof cloneImported>(cloneImported);
 
-
 export class TableElementTemplateDriven<T> extends TableElement<T> {
-
   _editing: boolean;
   _currentData: T;
 
@@ -15,8 +13,7 @@ export class TableElementTemplateDriven<T> extends TableElement<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  set validator(value: any) {
-  }
+  set validator(value: any) {}
 
   get currentData(): T {
     return this._currentData;

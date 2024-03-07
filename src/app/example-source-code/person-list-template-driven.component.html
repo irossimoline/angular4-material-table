@@ -5,24 +5,24 @@
     <ng-container matColumnDef="id">
       <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
       <mat-cell *matCellDef="let row">
-        {{row.id !== -1 ? row.id : ''}}
+        {{ row.id !== -1 ? row.id : '' }}
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-form-field>
-          <input matInput [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing">
+          <input matInput [(ngModel)]="row.currentData.name" placeholder="Name" [disabled]="!row.editing" />
         </mat-form-field>
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="age">
-      <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Age</mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-form-field>
-          <input matInput type="number" [(ngModel)]="row.currentData.age" placeholder="Age"  [disabled]="!row.editing">
+          <input matInput type="number" [(ngModel)]="row.currentData.age" placeholder="Age" [disabled]="!row.editing" />
         </mat-form-field>
       </mat-cell>
     </ng-container>
@@ -32,10 +32,12 @@
           <mat-icon>add_circle</mat-icon>
         </button>
         <button mat-button color="accent" (click)="dataSource.confirmAllRows()">
-          <mat-icon>done_all</mat-icon> Validate all
+          <mat-icon>done_all</mat-icon>
+          Validate all
         </button>
         <button mat-button color="accent" (click)="dataSource.addMany(generatePersons())">
-          <mat-icon>done_all</mat-icon> Add many
+          <mat-icon>done_all</mat-icon>
+          Add many
         </button>
       </mat-header-cell>
       <mat-cell *matCellDef="let row">
@@ -53,6 +55,6 @@
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
   </mat-table>
 </div>

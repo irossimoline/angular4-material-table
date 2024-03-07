@@ -14,3 +14,9 @@
 - [enh] Add `TableDatasource.hasNewElement`: boolean to known if there is a new+editing row
 - [enh] Add examples, using nav tabs
 - [enh] Add `ScrollableTableDataSource` to use CDK virtual scrolling (experimental - not yet exposed)
+
+## 17.0.0
+- [enh] Migrate to Angular 17.1
+
+## 17.2.0
+- [enh] Migrate to Angular 17.2 

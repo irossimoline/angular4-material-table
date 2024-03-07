@@ -1,9 +1,8 @@
-import {UntypedFormGroup} from '@angular/forms';
-import {waitWhilePending} from '../validator.utils';
-import {AsyncTableElement} from './async-table-element';
+import { UntypedFormGroup } from '@angular/forms';
+import { waitWhilePending } from '../validator.utils';
+import { AsyncTableElement } from './async-table-element';
 
 export class AsyncTableElementReactiveForms<T> extends AsyncTableElement<T> {
-
   validator: UntypedFormGroup;
 
   get currentData(): T {
@@ -49,17 +48,15 @@ export class AsyncTableElementReactiveForms<T> extends AsyncTableElement<T> {
   }
 
   async isValid(): Promise<boolean> {
-
     // Enable temporarily the validator to get the valid status
     const disabled = this.validator.disabled;
     if (disabled) {
-      this.validator.enable({emitEvent: false, onlySelf: true});
-      this.validator.updateValueAndValidity({emitEvent: false, onlySelf: true});
+      this.validator.enable({ emitEvent: false, onlySelf: true });
+      this.validator.updateValueAndValidity({ emitEvent: false, onlySelf: true });
     }
 
     try {
       if (!this.validator.valid) {
-
         // Wait end of async validation
         if (this.validator.pending) {
           // DEBUG
@@ -78,7 +75,7 @@ export class AsyncTableElementReactiveForms<T> extends AsyncTableElement<T> {
     } finally {
       // Re-disabled, if need
       if (disabled) {
-        this.validator.disable({emitEvent: false, onlySelf: true});
+        this.validator.disable({ emitEvent: false, onlySelf: true });
       }
     }
   }

@@ -1,19 +1,19 @@
-import {CollectionViewer, ListRange} from '@angular/cdk/collections';
-import {BehaviorSubject, Subject, Subscription} from 'rxjs';
-import {AsyncTableElementFactory} from './async-table-element.factory';
-import {ValidatorService} from '../validator.service';
-import {moveItemInArray} from '@angular/cdk/drag-drop';
-import {UntypedFormGroup} from '@angular/forms';
-import {TableDataSourceConfig} from '../table-data-source';
-import {AsyncTableElement} from './async-table-element';
-import {TableVirtualScrollDataSource} from 'ng-table-virtual-scroll';
+import { CollectionViewer, ListRange } from '@angular/cdk/collections';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { AsyncTableElementFactory } from './async-table-element.factory';
+import { ValidatorService } from '../validator.service';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { UntypedFormGroup } from '@angular/forms';
+import { TableDataSourceConfig } from '../table-data-source';
+import { AsyncTableElement } from './async-table-element';
+import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 
-export class ScrollableTableDataSource<T,
+export class ScrollableTableDataSource<
+  T,
   V extends ValidatorService = ValidatorService,
   C extends TableDataSourceConfig = TableDataSourceConfig,
-  R extends AsyncTableElement<T> = AsyncTableElement<T>
-  > extends TableVirtualScrollDataSource<R> {
-
+  R extends AsyncTableElement<T> = AsyncTableElement<T>,
+> extends TableVirtualScrollDataSource<R> {
   /**
    * Return the data array, of confirmed rows (currentData)
    */
@@ -57,14 +57,15 @@ export class ScrollableTableDataSource<T,
     data: T[],
     dataType?: new () => T,
     protected validatorService?: V,
-    config?: C) {
+    config?: C
+  ) {
     super([]);
 
     this._config = {
       prependNewElements: false,
       suppressErrors: false,
       restoreOriginalDataOnCancel: false,
-      ...config
+      ...config,
     };
 
     if (dataType) {
@@ -82,7 +83,7 @@ export class ScrollableTableDataSource<T,
     this.datasourceSubject = new Subject<T[]>();
     const rows = this.createRowsFromData(data);
     this.rowsSubject = new BehaviorSubject(rows);
-    this.rowsSubject.subscribe(rows => {
+    this.rowsSubject.subscribe((rows) => {
       this.data = rows;
       this._updateChangeSubscription();
     });
@@ -94,7 +95,7 @@ export class ScrollableTableDataSource<T,
     const formGroup = this.createRowValidator();
     if (formGroup != null) {
       const rowKeys = Object.keys(this.createNewObject());
-      const invalidKeys = Object.keys(formGroup.controls).filter(key => !rowKeys.some(x => x === key));
+      const invalidKeys = Object.keys(formGroup.controls).filter((key) => !rowKeys.some((x) => x === key));
       if (invalidKeys.length > 0) {
         console.error('Validator form control keys must match row object keys. Invalid keys: ' + invalidKeys.toString());
       }
@@ -106,7 +107,7 @@ export class ScrollableTableDataSource<T,
    * @param insertAt
    * @param options
    */
-  async createNew(insertAt?: number, options?: {editing?: boolean, originalData?: T, emitEvent?: boolean;}): Promise<R|undefined> {
+  async createNew(insertAt?: number, options?: { editing?: boolean; originalData?: T; emitEvent?: boolean }): Promise<R | undefined> {
     if (this.hasNewElement) {
       if (!this._config.suppressErrors) {
         console.warn('Cannot add new row, because already has nex row. Please confirm it first');
@@ -116,9 +117,9 @@ export class ScrollableTableDataSource<T,
 
     const rows = this.rowsSubject.getValue();
 
-    const [currentData, validator] = [options?.originalData || this.createNewObject(), this.createRowValidator({editing: options?.editing})];
+    const [currentData, validator] = [options?.originalData || this.createNewObject(), this.createRowValidator({ editing: options?.editing })];
 
-    const editing = (options?.editing !== false); // true by default
+    const editing = options?.editing !== false; // true by default
     const id = editing ? -1 : this.getRowIdFromIndex(rows.length, rows.length + 1);
     const newElement = AsyncTableElementFactory.createTableElement({
       id,
@@ -126,7 +127,7 @@ export class ScrollableTableDataSource<T,
       currentData,
       validator,
       // Link to datasource
-      source: this
+      source: this,
     });
 
     if (insertAt) {
@@ -147,13 +148,12 @@ export class ScrollableTableDataSource<T,
     }
 
     // Notify the changes
-    else if (!options || options.emitEvent !== false){
+    else if (!options || options.emitEvent !== false) {
       this.datasourceSubject.next(this.getDataFromRows(rows));
     }
 
     return newElement;
   }
-
 
   /**
    * Start the creation of a new element, pushing an empty-data row in the table.
@@ -161,7 +161,7 @@ export class ScrollableTableDataSource<T,
    * @param insertAt
    * @param options
    */
-  async addMany(originalData: T[], insertAt?: number, options?: {editing?: boolean, emitEvent?: boolean}): Promise<R[]|undefined> {
+  async addMany(originalData: T[], insertAt?: number, options?: { editing?: boolean; emitEvent?: boolean }): Promise<R[] | undefined> {
     if (this.hasNewElement) {
       if (!this._config.suppressErrors) {
         console.warn('Cannot add new row, because already has nex row. Please confirm it first');
@@ -173,7 +173,7 @@ export class ScrollableTableDataSource<T,
 
     // Create new rows:
     // WARNING: ids will be bad. Need to be recomputed (see bellow)
-    const newElements = this.createRowsFromData(originalData, {editing});
+    const newElements = this.createRowsFromData(originalData, { editing });
 
     // Retrieve actual rows array
     let rows = this.rowsSubject.getValue();
@@ -199,14 +199,14 @@ export class ScrollableTableDataSource<T,
     }
 
     // New rows have been confirmed: notify changes
-    else if (!options || options.emitEvent !== false){
+    else if (!options || options.emitEvent !== false) {
       this.updateDatasourceFromRows(this.rowsSubject.getValue());
     }
 
     return newElements;
   }
 
-  confirmEditCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
+  confirmEditCreate(row: R, options = { emitEvent: true }): Promise<boolean> {
     if (row.id === -1) {
       return this.confirmCreate(row, options);
     } else {
@@ -214,7 +214,7 @@ export class ScrollableTableDataSource<T,
     }
   }
 
-  cancelOrDelete(row: R, options = {emitEvent: true}): Promise<boolean> {
+  cancelOrDelete(row: R, options = { emitEvent: true }): Promise<boolean> {
     if (row.id === -1 || !row.editing) {
       return this.delete(row.id, options);
     } else {
@@ -228,7 +228,7 @@ export class ScrollableTableDataSource<T,
    * @param row Row to be confirmed.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  async confirmCreate(row: R, options = {emitEvent: true}): Promise<boolean> {
+  async confirmCreate(row: R, options = { emitEvent: true }): Promise<boolean> {
     const valid = await row.isValid();
     if (valid !== true) {
       return false;
@@ -253,7 +253,7 @@ export class ScrollableTableDataSource<T,
    * @param row Row to be edited.
    * @param options Use emitEvent=false to avoid 'datasourceSubject' to be updated
    */
-  async confirmEdit(row: R, options = {emitEvent: true}): Promise<boolean> {
+  async confirmEdit(row: R, options = { emitEvent: true }): Promise<boolean> {
     const valid = await row.isValid();
     if (valid !== true) {
       return false;
@@ -291,7 +291,7 @@ export class ScrollableTableDataSource<T,
   /**
    * Delete the row with the index specified.
    */
-  async delete(id: number, options = {emitEvent: true}): Promise<boolean> {
+  async delete(id: number, options = { emitEvent: true }): Promise<boolean> {
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
@@ -352,24 +352,24 @@ export class ScrollableTableDataSource<T,
     return true;
   }
 
-  async confirmAllRows( options = {emitEvent: true}): Promise<boolean> {
+  async confirmAllRows(options = { emitEvent: true }): Promise<boolean> {
     return this.confirmRows(this.rowsSubject.getValue(), options);
   }
 
-  async confirmRows(source: R[], options = {emitEvent: true}): Promise<boolean> {
-
+  async confirmRows(source: R[], options = { emitEvent: true }): Promise<boolean> {
     // Get editing rows
     const editingRows = this.getEditingRows(source);
     if (editingRows.length === 0) return true; // No row to confirm
 
     // Try to confirm each rows
     const confirmResults = await Promise.all(
-      editingRows
-        .map(row => this.confirmEditCreate(row, {emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after*/}))
+      editingRows.map((row) =>
+        this.confirmEditCreate(row, { emitEvent: false /* Avoid calling updateDatasourceFromRows() here, to make sure to call it once, just after*/ })
+      )
     );
 
     // Update datasource, if some rows has been confirmed (=changed)
-    const confirmedRowCount = confirmResults.filter(ok => ok).length;
+    const confirmedRowCount = confirmResults.filter((ok) => ok).length;
     if (confirmedRowCount > 0 && (!options || options.emitEvent !== false)) {
       this.updateDatasourceFromRows(this.rowsSubject.getValue());
     }
@@ -386,7 +386,7 @@ export class ScrollableTableDataSource<T,
     const source = this.rowsSubject.getValue();
     const index = this.getIndexFromRowId(id, source);
 
-    return (index >= 0 && index < source.length) ? source[index] : null;
+    return index >= 0 && index < source.length ? source[index] : null;
   }
 
   /**
@@ -398,7 +398,7 @@ export class ScrollableTableDataSource<T,
    * from 'datasourceSubject' with the updated data. If false, it doesn't
    * emit an event. True by default.
    */
-  updateDatasource(data: T[], options = {emitEvent: true}): void {
+  updateDatasource(data: T[], options = { emitEvent: true }): void {
     if (this.currentData !== data) {
       this.currentData = data;
 
@@ -423,7 +423,7 @@ export class ScrollableTableDataSource<T,
    * Get editing rows
    */
   protected getEditingRows(source: R[]): R[] {
-    return source.filter(row => row.editing);
+    return source.filter((row) => row.editing);
   }
 
   /**
@@ -457,7 +457,7 @@ export class ScrollableTableDataSource<T,
    * @param source
    */
   protected getIndexFromRowId(id: number, source: R[]): number {
-    return source.findIndex(element => element.id === id);
+    return source.findIndex((element) => element.id === id);
   }
 
   /**
@@ -468,7 +468,6 @@ export class ScrollableTableDataSource<T,
    * @param source Array that contains the rows to be updated.
    */
   protected updateRowIds(initialIndex: number, source: R[]): void {
-
     const delta = this._config.prependNewElements ? -1 : 1;
 
     for (let index = initialIndex; index < source.length && index >= 0; index += delta) {
@@ -483,12 +482,8 @@ export class ScrollableTableDataSource<T,
    * @param rows Rows to extract the data.
    */
   protected getDataFromRows(rows: R[]): T[] {
-    const mapToDataFn = !this._config.restoreOriginalDataOnCancel
-      ? (row => row.originalData || row.currentData)
-      : (row => row.currentData); // Always return currentData, if orginalData is NOT update at each edition
-    return rows
-      .filter(row => row.id !== -1)
-      .map<T>(mapToDataFn);
+    const mapToDataFn = !this._config.restoreOriginalDataOnCancel ? (row) => row.originalData || row.currentData : (row) => row.currentData; // Always return currentData, if orginalData is NOT update at each edition
+    return rows.filter((row) => row.id !== -1).map<T>(mapToDataFn);
   }
 
   /**
@@ -505,12 +500,11 @@ export class ScrollableTableDataSource<T,
    * @param arrayData Data from which create the rows.
    * @param options
    */
-  protected createRowsFromData(arrayData: T[], options = {editing : false}): R[] {
-
+  protected createRowsFromData(arrayData: T[], options = { editing: false }): R[] {
     // Create many validators (batch mode)
     const validators = this.createRowValidators(arrayData.length);
 
-    const editing  = options.editing === true; // false by default (e.g. when initial data)
+    const editing = options.editing === true; // false by default (e.g. when initial data)
 
     return arrayData.map<R>((data, index) => {
       return AsyncTableElementFactory.createTableElement({
@@ -519,7 +513,7 @@ export class ScrollableTableDataSource<T,
         currentData: data,
         validator: validators[index],
         // Link to datasource
-        source: this
+        source: this,
       });
     });
   }
@@ -541,7 +535,7 @@ export class ScrollableTableDataSource<T,
     }
   }
 
-  protected createRowValidator(options = {editing: true}): UntypedFormGroup {
+  protected createRowValidator(options = { editing: true }): UntypedFormGroup {
     if (!this.validatorService) return null;
     const validator = this.validatorService.getRowValidator();
 
@@ -558,9 +552,9 @@ export class ScrollableTableDataSource<T,
    * @param options
    * @protected
    */
-  protected createRowValidators(count: number, options = {editing: false}): UntypedFormGroup[] {
+  protected createRowValidators(count: number, options = { editing: false }): UntypedFormGroup[] {
     const validators = new Array<UntypedFormGroup>(count);
-    for (let i = 0; i<count; i++) {
+    for (let i = 0; i < count; i++) {
       validators[i] = this.createRowValidator(options);
     }
     return validators;

@@ -1,14 +1,13 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {TableDataSource} from '../ngx-material-table/table-data-source';
-import {environment} from '../../environments/environment';
-import {Person, generatePersons} from './person.model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { TableDataSource } from '../ngx-material-table/table-data-source';
+import { environment } from '../../environments/environment';
+import { Person, generatePersons } from './person.model';
 
 @Component({
   selector: 'app-person-list-template-driven',
   templateUrl: './person-list-template-driven.component.html',
 })
 export class PersonListTemplateDrivenComponent implements OnInit {
-
   private _displayedColumns = ['id', 'name', 'age', 'actionsColumn'];
 
   dataSource: TableDataSource<Person>;
@@ -22,17 +21,18 @@ export class PersonListTemplateDrivenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataSource = new TableDataSource<Person>(this.personList || [],
+    this.dataSource = new TableDataSource<Person>(
+      this.personList || [],
       Person,
       null, // No validator
       {
         prependNewElements: false,
-        suppressErrors: !environment.production
-      });
+        suppressErrors: !environment.production,
+      }
+    );
 
-    this.dataSource.datasourceSubject.subscribe(personList => this.personListChange.emit(personList));
+    this.dataSource.datasourceSubject.subscribe((personList) => this.personListChange.emit(personList));
   }
 
   generatePersons = generatePersons;
-
 }

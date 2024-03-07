@@ -1,8 +1,7 @@
-import {TableElementReactiveForms} from './table-element-reactive-forms';
-import {TableElementTemplateDriven} from './table-element-template-driven';
+import { TableElementReactiveForms } from './table-element-reactive-forms';
+import { TableElementTemplateDriven } from './table-element-template-driven';
 
 export class TableElementFactory {
-
   public static createTableElement(newElement: any): any {
     if (this.isValidatorDefined(newElement)) {
       // Create reactive forms element here.

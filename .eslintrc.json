@@ -23,8 +23,6 @@
       "extends": [
         "eslint:recommended",
         "plugin:prettier/recommended",
-        "plugin:@rx-angular/recommended",
-        "plugin:@rx-angular/zoneless",
         "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
         // This is required if you use inline templates in Components
@@ -34,13 +32,14 @@
         "prettier/prettier": "off",
         "@angular-eslint/component-class-suffix": "off",
         "@angular-eslint/no-output-rename": "off",
+        "@angular-eslint/no-output-on-prefix": "warn",
         "@typescript-eslint/consistent-type-assertions": "off",
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/naming-convention": "off",
         "@typescript-eslint/dot-notation": "off",
-        "prefer-arrow/prefer-arrow-functions": "off",
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/ban-types": "off",
-        "@angular-eslint/no-output-on-prefix": "warn",
+        "prefer-arrow/prefer-arrow-functions": "off",
         "@typescript-eslint/explicit-member-accessibility": [
           "off",
           {

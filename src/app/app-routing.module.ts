@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {BasicExampleComponent} from "./example-source-code/basic-example.component";
-import {PersonListScrollableComponent} from "./example-source-code/person-list-scrollable.component";
-import {PersonListAsyncReactiveFormsComponent} from "./example-source-code/person-list-async-reative-forms.component"; // CLI imports router
+import { BasicExampleComponent } from './example-source-code/basic-example.component';
+import { PersonListScrollableComponent } from './example-source-code/person-list-scrollable.component';
+import { PersonListAsyncReactiveFormsComponent } from './example-source-code/person-list-async-reative-forms.component'; // CLI imports router
 
 const routes: Routes = [
   { path: '', component: BasicExampleComponent },
@@ -13,6 +13,6 @@ const routes: Routes = [
 // configures NgModule imports and exports
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

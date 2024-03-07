@@ -1,20 +1,17 @@
-import {ValidatorService} from '../ngx-material-table/validator.service';
-import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import { ValidatorService } from '../ngx-material-table/validator.service';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { PersonValidatorService } from './person-list.validator';
-import {TableDataSource} from '../ngx-material-table/table-data-source';
-import {environment} from '../../environments/environment';
-import {generatePersons, Person} from './person.model';
+import { TableDataSource } from '../ngx-material-table/table-data-source';
+import { environment } from '../../environments/environment';
+import { generatePersons, Person } from './person.model';
 
 @Component({
   selector: 'app-person-list-reactive-forms',
   templateUrl: './person-list-reactive-forms.component.html',
-  providers: [
-    {provide: ValidatorService, useClass: PersonValidatorService }
-  ]
+  providers: [{ provide: ValidatorService, useClass: PersonValidatorService }],
 })
 export class PersonListReactiveFormsComponent implements OnInit {
-
-  constructor(private personValidator: ValidatorService) { }
+  constructor(private personValidator: ValidatorService) {}
 
   _displayedColumns = ['id', 'name', 'age', 'actionsColumn'];
 
@@ -29,18 +26,13 @@ export class PersonListReactiveFormsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataSource = new TableDataSource<Person>(this.personList || [],
-      Person,
-      this.personValidator,
-      {
-        prependNewElements: false,
-        suppressErrors: !environment.production
-      });
+    this.dataSource = new TableDataSource<Person>(this.personList || [], Person, this.personValidator, {
+      prependNewElements: false,
+      suppressErrors: !environment.production,
+    });
 
-    this.dataSource.datasourceSubject.subscribe(personList => this.personListChange.emit(personList));
+    this.dataSource.datasourceSubject.subscribe((personList) => this.personListChange.emit(personList));
   }
 
   generatePersons = generatePersons;
-
-
 }

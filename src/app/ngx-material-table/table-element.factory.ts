@@ -2,7 +2,6 @@ import { TableElementReactiveForms } from './table-element-reactive-forms';
 import { TableElementTemplateDriven } from './table-element-template-driven';
 
 export class TableElementFactory {
-
   public static createTableElement(newElement: any): any {
     if (this.isValidatorDefined(newElement)) {
       // Create reactive forms element here.
@@ -14,6 +13,6 @@ export class TableElementFactory {
   }
 
   static isValidatorDefined(newElement: any) {
-    return newElement.validator != null && newElement.validator != undefined; 
+    return newElement.validator !== undefined && newElement.validator !== null;
   }
 }

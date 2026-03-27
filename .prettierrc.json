@@ -1,0 +1,17 @@
+{
+  "trailingComma": "es5",
+  "semi": true,
+  "singleQuote": true,
+  "printWidth": 150,
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": "src/app/**/*.html",
+      "options": {
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "ignore",
+        "printWidth": 120
+      }
+    }
+  ]
+}

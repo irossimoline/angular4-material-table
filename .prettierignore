@@ -1,0 +1,8 @@
+.local
+.husky
+.angular
+dist
+doc
+node_modules
+scripts
+www

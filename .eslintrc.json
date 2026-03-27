@@ -1,0 +1,110 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "/dist/**/*.*",
+    "/doc/**/*.*",
+    "/resources/**/*.*",
+    "/scripts/**/*.*",
+    "/www/**/*.*",
+    "/src/**/*.test*.ts",
+    "index.html"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "tsconfig.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "eslint:recommended",
+        "plugin:prettier/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        // This is required if you use inline templates in Components
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "prettier/prettier": "off",
+        "@angular-eslint/component-class-suffix": "off",
+        "@angular-eslint/no-output-rename": "off",
+        "@angular-eslint/no-output-on-prefix": "warn",
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/consistent-type-definitions": "error",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "prefer-arrow/prefer-arrow-functions": "off",
+        "@typescript-eslint/explicit-member-accessibility": [
+          "off",
+          {
+            "accessibility": "explicit"
+          }
+        ],
+        "@typescript-eslint/member-ordering": [
+          "off",
+          {
+            "default": {
+              "memberTypes": [
+                // Index signature
+                "signature",
+
+                // Getters and Setters at the same rank
+                ["get", "set", "field"],
+
+                // Static initialization
+                "static-initialization",
+
+                // Constructors
+                "constructor",
+
+                // Methods
+                "method"
+              ]
+            }
+          }
+        ],
+        "brace-style": [
+          "off",
+          "off"
+        ],
+        "curly": "off",
+        "dot-notation": "off",
+        "id-blacklist": "off",
+        "id-match": "off",
+        "no-empty-function": "off",
+        "@typescript-eslint/no-shadow": [
+          "off",
+          {
+            "hoist": "all"
+          }
+        ],
+        "no-trailing-spaces": "off",
+        "no-undef-init": "off",
+        "no-underscore-dangle": "off",
+        "no-unused-expressions": "error",
+        "no-use-before-define": "off",
+        "radix": "off",
+        "semi": "error",
+        "no-console": "off",
+        "max-len": "off",
+        "no-throw-literal": "off"
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "rules": {}
+    }
+  ]
+}

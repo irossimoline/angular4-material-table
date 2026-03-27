@@ -1,0 +1,80 @@
+@use '@angular/material' as mat;
+
+// --------------------------------------------------
+// Import font
+// --------------------------------------------------
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
+
+// --------------------------------------------------
+// Custom style
+// --------------------------------------------------
+
+html {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  margin: 0;
+  //color: #333333;
+}
+
+app-root {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapper {
+  --margin: 16px;
+  margin: var(--margin, 0px);
+}
+.mdc-text-field--filled {
+  background-color: transparent !important;
+}
+.mat-mdc-form-field-focus-overlay {
+  background-color: inherit !important;
+}
+.mdc-text-field--no-label:not(.mdc-text-field--outlined):not(.mdc-text-field--textarea) .mat-mdc-form-field-infix {
+  padding-top: 22px !important;
+  padding-bottom: 4px !important;
+}
+.mat-mdc-form-field-infix {
+  min-height: unset !important;
+}
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$theming-material-components-primary: mat.$m2-indigo-palette;
+$theming-material-components-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+
+// --------------------------------------------------
+// Material theme
+// --------------------------------------------------
+$primary: mat.m2-define-palette(mat.$m2-indigo-palette, 500);
+$accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+$warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+@include mat.elevation-classes();
+@include mat.app-background();
+
+@include mat.all-component-themes($theme);
+
+// --------------------------------------------------
+// Import icons
+// --------------------------------------------------
+@import 'material-design-icons/iconfont/material-icons.css';

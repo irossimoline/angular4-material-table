@@ -1,32 +1,33 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "inlineSources": true,
     "declaration": true,
     "stripInternal": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
-    "module": "es2015",
-    "moduleResolution": "node",
-    "paths": {
-      "@angular/core": ["node_modules/@angular/core"],
-      "rxjs/*": ["node_modules/rxjs/*"]
-    },
-    "rootDir": ".",
-    "outDir": "dist",
-    "sourceMap": true,
-    "inlineSources": true,
-    "target": "es5",
-    "skipLibCheck": true,
+    "incremental": true,
+    "module": "es2020",
+    "moduleResolution": "bundler",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "target": "es2022",
     "lib": [
-      "es2015",
+      "es2020",
       "dom"
     ]
   },
-  "files": [
-    "index.ts"
-  ],
   "angularCompilerOptions": {
-    "strictMetadataEmit": true
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true,
+    "fullTemplateTypeCheck": true
   }
 }
